@@ -18,7 +18,7 @@ dataRDS$BMI[dataRDS$BMI > 30] <- 4
 summary(dataset)
 
 # cleannames columns for dataset
-dataset <- clean_names(dataRDS)
+dataRDS <- clean_names(dataRDS)
 
 # PassengerId Survived Pclass Name Sex Age SibSp Parch Ticket Fare Cabin Embarked
 
