@@ -5,7 +5,16 @@ format: html
 
 ```{r}
 setwd(".")
+
+# install.packages("pairsD3")
+require("pairsD3")
 ```
+
+------------------------------------------------------------------------
+
+1.  **Preliminaries:** Introduction of your research questions, description and potential processing of your data.
+
+------------------------------------------------------------------------
 
 ```{r}
 # Load .CSV and save as .RDS
@@ -26,16 +35,18 @@ dataRDS$BMI[dataRDS$BMI > 25 & dataRDS$BMI <= 30 ] <- 3
 dataRDS$BMI[dataRDS$BMI > 30] <- 4
 
 summary(dataset)
-
-# cleannames columns for dataset
-dataRDS <- clean_names(dataRDS)
 ```
+
+1.  **Model estimation:** Description of the model estimates, model fit, and model comparison procedure (including moderation)
 
 ```{r}
 dataRDS
+
+#shinypairs(dataRDS)
+
 pairs(dataRDS)
 
-model2 <- lm(Glucose ~ Age + Insulin + BMI, 
+model2 <- lm(Glucose ~ Age + Insulin + BMI + Pregnancies + BloodPressure + SkinThickness + DiabetesPedigreeFunction, 
              data = dataRDS)
 
 # Ask for summary statistics again
@@ -46,7 +57,7 @@ library(ggplot2)
 # Assuming 'df' is your data frame with columns 'y', 'x1', 'x2'
 
 # Plot with regression line for x1
-ggplot(dataRDS, aes(x = Age, y = Glucose)) +
+ggplot(dataRDS, aes(x = SkinThickness, y = Glucose)) +
   geom_point() +
   geom_smooth(method = "lm", se = FALSE) + # se = FALSE to hide confidence interval
   labs(title = "Relationship between Age and Glucose")
@@ -58,4 +69,25 @@ ggplot(dataRDS, aes(x = Insulin, y = Glucose)) +
   labs(title = "Relationship between {Insulin} and Glucose")
 
 
+
 ```
+
+1.  **Assumptions:** Testing of model assumptions, checking for influential cases. Act upon and/or reflect on violations when needed.
+
+```{r}
+
+```
+
+1.  **Interpretation:** Substantive interpretation of the final model. Answering your research question.
+
+```{r}
+
+```
+
+1.  **Layout:** Structure of the document, efficiency of output presentation, use of custom functions (when applicable). Presentation of suitable visualizations.
+
+```{r}
+
+```
+
+1.  **Coding:** Use code from the labs and annotate what each piece of code does.
