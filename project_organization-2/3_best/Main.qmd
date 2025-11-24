@@ -4,6 +4,10 @@ format: html
 ---
 
 ```{r}
+setwd(".")
+```
+
+```{r}
 # Load .CSV and save as .RDS
 
 datacsv <- read.csv("./data/raw/diabetes.csv", header = TRUE)
@@ -31,7 +35,7 @@ dataRDS <- clean_names(dataRDS)
 dataRDS
 pairs(dataRDS)
 
-model2 <- lm(Outcome ~ Age + BMI, 
+model2 <- lm(Glucose ~ Age + Insulin + BMI, 
              data = dataRDS)
 
 # Ask for summary statistics again
@@ -42,16 +46,16 @@ library(ggplot2)
 # Assuming 'df' is your data frame with columns 'y', 'x1', 'x2'
 
 # Plot with regression line for x1
-ggplot(dataRDS, aes(x = Age, y = Outcome)) +
+ggplot(dataRDS, aes(x = Age, y = Glucose)) +
   geom_point() +
   geom_smooth(method = "lm", se = FALSE) + # se = FALSE to hide confidence interval
-  labs(title = "Relationship between y and x1")
+  labs(title = "Relationship between Age and Glucose")
 
 # Plot with regression line for x2
-ggplot(dataRDS, aes(x = BMI, y = Outcome)) +
+ggplot(dataRDS, aes(x = Insulin, y = Glucose)) +
   geom_point() +
   geom_smooth(method = "lm", se = FALSE) +
-  labs(title = "Relationship between y and x2")
+  labs(title = "Relationship between {Insulin} and Glucose")
 
 
 ```
