@@ -34,23 +34,26 @@ dataRDS$BMI[dataRDS$BMI > 18.5 & dataRDS$BMI <= 25  ] <- 2
 dataRDS$BMI[dataRDS$BMI > 25 & dataRDS$BMI <= 30 ] <- 3
 dataRDS$BMI[dataRDS$BMI > 30] <- 4
 
+# Adding moderation
+dataRDS$moderation <- dataRDS$BMI * dataRDS$Insulin * dataRDS$SkinThickness * (dataRDS$BloodPressure) 
+
 summary(dataset)
 ```
 
 1.  **Model estimation:** Description of the model estimates, model fit, and model comparison procedure (including moderation)
 
 ```{r}
-dataRDS
 
+dataRDS
 #shinypairs(dataRDS)
 
 pairs(dataRDS)
 
-model <- lm(Glucose ~ Age + Insulin + BMI + Pregnancies + BloodPressure + SkinThickness + DiabetesPedigreeFunction, 
+model <- lm(Glucose ~ Age + Insulin + BMI + Pregnancies + BloodPressure + SkinThickness + DiabetesPedigreeFunction + moderation, 
              data = dataRDS)
-model2 <- lm(Glucose ~ Age + Insulin + BMI + SkinThickness + DiabetesPedigreeFunction, 
+model2 <- lm(Glucose ~ Age + Insulin + BMI + SkinThickness + moderation + DiabetesPedigreeFunction, 
              data = dataRDS)
-model3 <- lm(Glucose ~ Age + Insulin + BMI + SkinThickness, 
+model3 <- lm(Glucose ~ Age + Insulin + BMI + SkinThickness + moderation, 
              data = dataRDS)
 
 # Ask for summary statistics again
@@ -58,8 +61,9 @@ summary(model)
 summary(model2)
 summary(model3)
 
-library(ggplot2)
+anova(model, model2, model3)
 
+library(ggplot2)
 
 # Plot with regression line for x1
 ggplot(dataRDS, aes(x = Age, y = Glucose)) +
@@ -83,7 +87,13 @@ ggplot(dataRDS, aes(x = SkinThickness, y = Glucose)) +
 ggplot(dataRDS, aes(x = BMI, y = Glucose)) +
   geom_point() +
   geom_smooth(method = "lm", se = FALSE) +
-  labs(title = "Relationship between {Insulin} and Glucose")
+  labs(title = "Relationship between {BMI} and Glucose")
+
+# Plot with regression line for x2
+ggplot(dataRDS, aes(x = moderation, y = Glucose)) +
+  geom_point() +
+  geom_smooth(method = "lm", se = FALSE) +
+  labs(title = "Relationship between {Moderation} and Glucose")
 
 
 ```
