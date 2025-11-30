@@ -26,13 +26,17 @@ The different parameters in the dataset are:
 
 To preprocess the data we categorized the BMI into four categories, being underweight, healthy, overweight and obese. We have kept all the data, because there were not many missing values or flukes in the data.
 
+```{r}
+install.packages('car')
+
+```
+
 ------------------------------------------------------------------------
 
 ```{r}
+# Initialization
 setwd(".")
 library(ggplot2)
-# install.packages("pairsD3")
-require("pairsD3")
 ```
 
 ```{r}
@@ -59,11 +63,8 @@ dataRDS$moderation <- dataRDS$BMI * dataRDS$Insulin * dataRDS$SkinThickness * (d
 summary(dataset)
 ```
 
-1.  **Model estimation:** Description of the model estimates, model fit, and model comparison procedure (including moderation)
-
 ```{r}
 dataRDS
-#shinypairs(dataRDS)
 for (i in 1:ncol(dataRDS)) {
   col_name <- colnames(dataRDS)[i]
   print(hist(dataRDS[, i],
@@ -117,36 +118,69 @@ anova(model, model2, model3)
 ggplot(dataRDS, aes(x = Age, y = Glucose)) +
   geom_point() +
   geom_smooth(method = "lm", se = FALSE) + # se = FALSE to hide confidence interval
-  labs(title = "Relationship between Age and Glucose")
+  labs(title = "Linear Relationship between Age and Glucose")
 
 # Plot with regression line for x2
 ggplot(dataRDS, aes(x = Insulin, y = Glucose)) +
   geom_point() +
   geom_smooth(method = "lm", se = FALSE) +
-  labs(title = "Relationship between {Insulin} and Glucose")
+  labs(title = "Linear Relationship between Insulin and Glucose")
 
 # Plot with regression line for x1
 ggplot(dataRDS, aes(x = SkinThickness, y = Glucose)) +
   geom_point() +
   geom_smooth(method = "lm", se = FALSE) + # se = FALSE to hide confidence interval
-  labs(title = "Relationship between Age and Glucose")
+  labs(title = "Linear Relationship between Age and Glucose")
 
 # Plot with regression line for x2
 ggplot(dataRDS, aes(x = BMI, y = Glucose)) +
   geom_point() +
   geom_smooth(method = "lm", se = FALSE) +
-  labs(title = "Relationship between {BMI} and Glucose")
+  labs(title = "Linear Relationship between BMI and Glucose")
 
 # Plot with regression line for x2
 ggplot(dataRDS, aes(x = moderation, y = Glucose)) +
   geom_point() +
   geom_smooth(method = "lm", se = FALSE) +
-  labs(title = "Relationship between {Moderation} and Glucose")
+  labs(title = "Linear Relationship between Moderation and Glucose")
 
+# Boxplot for Age vs Glucose
+ggplot(dataRDS, aes(x = factor(Age), y = Glucose)) +
+  geom_boxplot() +
+  labs(title = "Glucose Distribution by Age")
+
+# Boxplot for Insulin vs Glucose
+ggplot(dataRDS, aes(x = factor(Insulin), y = Glucose)) +
+  geom_boxplot() +
+  labs(title = "Glucose Distribution by Insulin Level")
+
+# Boxplot for SkinThickness vs Glucose
+ggplot(dataRDS, aes(x = factor(SkinThickness), y = Glucose)) +
+  geom_boxplot() +
+  labs(title = "Glucose Distribution by Skin Thickness")
+
+# Boxplot for BMI vs Glucose
+ggplot(dataRDS, aes(x = factor(BMI), y = Glucose)) +
+  geom_boxplot() +
+  labs(title = "Glucose Distribution by BMI")
+
+# Boxplot for Moderation vs Glucose, moet maar over geargumenteerd worden
+ggplot(dataRDS, aes(x = factor(moderation), y = Glucose)) +
+  geom_boxplot() +
+  labs(title = "Glucose Distribution by Moderation")
+
+# linearity test
+library(car)
+
+model <- lm(Glucose ~ Age + Insulin + SkinThickness + BMI + moderation,
+            data = dataRDS)
+
+vif(model)
 
 ```
 
 1.  **Assumptions:** Testing of model assumptions, checking for influential cases. Act upon and/or reflect on violations when needed.
+2.  **Model estimation:** Description of the model estimates, model fit, and model comparison procedure (including moderation)
 
 ```{r}
 # Assumptions are: linearity, Exogenous predictors, constant finite error variance Predictor matrix full rank, independent errors, normal distributed errors.
@@ -164,7 +198,7 @@ ggplot(dataRDS, aes(x = moderation, y = Glucose)) +
 
 ```
 
-1.  **Coding:** Use code from the labs and annotate what each piece of code does.
+**References**
 
 Cijfers over diabetes. (n.d.). diabetes.nl. https://www.diabetes.nl/wat-is-diabetes/over-diabetes/cijfers-over-diabetes
 
