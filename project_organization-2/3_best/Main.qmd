@@ -28,7 +28,6 @@ To preprocess the data we categorized the BMI into four categories, being underw
 
 ```{r}
 install.packages('car')
-
 ```
 
 ------------------------------------------------------------------------
@@ -37,6 +36,7 @@ install.packages('car')
 # Initialization
 setwd(".")
 library(ggplot2)
+library(car)
 ```
 
 ```{r}
@@ -144,6 +144,16 @@ ggplot(dataRDS, aes(x = moderation, y = Glucose)) +
   geom_smooth(method = "lm", se = FALSE) +
   labs(title = "Linear Relationship between Moderation and Glucose")
 
+
+
+```
+
+1.  **Assumptions:** Testing of model assumptions, checking for influential cases. Act upon and/or reflect on violations when needed.
+2.  **Model estimation:** Description of the model estimates, model fit, and model comparison procedure (including moderation)
+
+```{r}
+# Assumptions are: linearity, Exogenous predictors, constant finite error variance Predictor matrix full rank, independent errors, normal distributed errors.
+
 # Boxplot for Age vs Glucose
 ggplot(dataRDS, aes(x = factor(Age), y = Glucose)) +
   geom_boxplot() +
@@ -169,42 +179,18 @@ ggplot(dataRDS, aes(x = factor(moderation), y = Glucose)) +
   geom_boxplot() +
   labs(title = "Glucose Distribution by Moderation")
 
-# linearity test
-library(car)
-
-model <- lm(Glucose ~ Age + Insulin + SkinThickness + BMI + moderation,
-            data = dataRDS)
-
-vif(model)
-
+vif(model3)
 ```
-
-1.  **Assumptions:** Testing of model assumptions, checking for influential cases. Act upon and/or reflect on violations when needed.
-2.  **Model estimation:** Description of the model estimates, model fit, and model comparison procedure (including moderation)
 
 For the assumptions of the linear regression we checked for linearity, normal distribution, homoscedasticity, multicollinearity, and outliers. We checked for linearity ... . Normal distribution was found in both a K-S test (...) and through the use of a histogram, which showed a nice curve with perhaps the tiniest skewing on the left side. Homoscedasticity was assessed and confirmed by plotting the predicted values against the residuals, with no clear funnel or other deviant pattern being observed. Multicollinearity was checked through VIF tests (...). Lastly, there were x outliers found.
 
 ```{r}
-# Assumptions are: linearity, Exogenous predictors, constant finite error variance Predictor matrix full rank, independent errors, normal distributed errors.
+summary(model3)
 ```
 
-1.  **Interpretation:** Substantive interpretation of the final model. Answering your research question.
+A multiple linear regression was conducted to examine the predictors for glucose levels. This was done through the use of age, insulin, BMI, skin thickness, and a moderation variable. The overall model was significant (F(5, 762) = 44.13, p \> .001) and explains 22,5% of the variance in glucose (R² = .2245). Age has a positive effect on glucose levels where older individuals have a higher glucose level (𝛽 = .66, p \< .001). The same is true for both insulin levels (𝛽 = .068, p \< .001 and BMI (𝛽 = 6.84, p \< .001). Skin thickness however has a negative effect, thus participants with a thicker skin showed lower levels of glucose (𝛽 = -.32, p \< .001). The moderation effect is significant as well (𝛽 = 3.965e-06, p \< .047). However, the effect size is so small that it can be considered negligible. Overall, the results suggest that age, insulin, BMI, and skin thickness contribute meaningfully to glucose level variation.
 
-```{r}
-
-```
-
-1.  **Layout:** Structure of the document, efficiency of output presentation, use of custom functions (when applicable). Presentation of suitable visualizations.
-
-```{r}
-
-```
-
-1. Discussion relevant variables: discussion results coefficients table and ANOVA outcome model 3
-
-A multiple linear regression was conducted to examine the predictors for glucose levels. This was done through the use of age, insulin, BMI, skin thickness, and a moderation variable. The overall model was significant (F(5, 762) = 44.13, p > .001) and explains 22,5% of the variance in glucose (R² = .2245). Age has a positive effect on glucose levels where older individuals have a higher glucose level (𝛽 = .66, p < .001). The same is true for both insulin levels (𝛽 = .068, p < .001 and BMI (𝛽 = 6.84, p < .001). Skin thickness however has a negative effect, thus participants with a thicker skin showed lower levels of glucose (𝛽 = -.32, p < .001). The moderation effect is significant as well (𝛽 = 3.965e-06, p < .047). However, the effect size is so small that it can be considered negligible. Overall, the results suggest that age, insulin, BMI, and skin thickness contribute meaningfully to glucose level variation.
-
-In model 3, an ANOVA was done to look at the level of prediction of age, insulin, BMI, and skin thickness on glucose levels, and whether this association was influenced by the moderation term. The model shows that the interaction term significantly influences the relationship between the predictors and glucose levels (F(1, 762) = 4.91, p > .027). This means that the relationship between one of the predictors and glucose levels differs depending on the level of the moderator.
+In model 3, an ANOVA was done to look at the level of prediction of age, insulin, BMI, and skin thickness on glucose levels, and whether this association was influenced by the moderation term. The model shows that the interaction term significantly influences the relationship between the predictors and glucose levels (F(1, 762) = 4.91, p \> .027). This means that the relationship between one of the predictors and glucose levels differs depending on the level of the moderator.
 
 **References**
 
