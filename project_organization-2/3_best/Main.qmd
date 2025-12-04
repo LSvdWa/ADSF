@@ -38,12 +38,15 @@ The different parameters in the dataset are:
 To preprocess the data we categorized the BMI into four categories, being underweight, healthy, overweight and obese. We have kept all the data, because there were not many missing values or flukes in the data.
 
 ```{r}
+#| warning: false
 install.packages('car')
 ```
 
 ------------------------------------------------------------------------
 
 ```{r}
+#| warning: false
+
 # Initialization
 setwd(".")
 library(ggplot2)
@@ -51,6 +54,8 @@ library(car)
 ```
 
 ```{r}
+#| warning: false
+
 # Load .CSV and save as .RDS
 
 datacsv <- read.csv("./data/raw/diabetes.csv", header = TRUE)
@@ -75,6 +80,8 @@ summary(dataset)
 ```
 
 ```{r}
+#| warning: false
+
 dataRDS
 for (i in 1:ncol(dataRDS)) {
   col_name <- colnames(dataRDS)[i]
@@ -110,6 +117,8 @@ Above you can see multiple ways that our variables are described. They are repre
 -   **Moderation:** Product of the following values: BMI, Insulin, SkinThickness and BloodPressure. This value is added to support the regression accuracy.
 
 ```{r}
+#| warning: false
+
 model <- lm(Glucose ~ Age + Insulin + BMI + Pregnancies + BloodPressure + SkinThickness + DiabetesPedigreeFunction + moderation, 
              data = dataRDS)
 model2 <- lm(Glucose ~ Age + Insulin + BMI + SkinThickness + moderation + DiabetesPedigreeFunction, 
@@ -160,6 +169,8 @@ ggplot(dataRDS, aes(x = moderation, y = Glucose)) +
 ```
 
 ```{r}
+#| warning: false
+
 # Assumptions are: linearity, Exogenous predictors, constant finite error variance, Predictor matrix full rank, independent errors, normal distributed errors.
 
 # Boxplot for Age vs Glucose
@@ -207,6 +218,8 @@ moderation     3.965e-06
 2.  Predictor model is full rank:
 
 ```{r}
+#| warning: false
+
 # turns model to matrix
 X <- model.matrix(model3)
 
@@ -226,6 +239,8 @@ Assumptions 3-6 can be shown if:
 $\varepsilon \stackrel{idd}{\sim} N(O,\sigma^2)$
 
 ```{r}
+#| warning: false
+
 # Check if the model is normally distributed
 plot(model3, which = 2)
 # shapiro test is significant so its normally distributed
@@ -245,6 +260,8 @@ plot(fitted(model3), resid(model3)) + abline(h=0, col="pink")
 For the assumptions of the linear regression we checked for linearity, normal distribution, homoscedasticity, multicollinearity, and outliers. We checked for linearity ... . Normal distribution was found in both a K-S test (...) and through the use of a histogram, which showed a nice curve with perhaps the tiniest skewing on the left side. Homoscedasticity was assessed and confirmed by plotting the predicted values against the residuals, with no clear funnel or other deviant pattern being observed. Multicollinearity was checked through VIF tests (...). Lastly, there were x outliers found.
 
 ```{r}
+#| warning: false
+
 summary(model3)
 ```
 
