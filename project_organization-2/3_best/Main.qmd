@@ -219,7 +219,6 @@ moderation     3.965e-06
 
 ```{r}
 #| warning: false
-
 # turns model to matrix
 X <- model.matrix(model3)
 
@@ -227,11 +226,10 @@ X <- model.matrix(model3)
 qr(X)$rank == ncol(X)
 ```
 
-2.  --
 3.  Predictors are strictly exogenous:
-    -   i.e. the predictors do not corrolate with the errors
+    -   i.e. the predictors do not corralate with the errors
 4.  The errors have constant, finite variance
-5.  Errors are uncorrolated
+5.  Errors are uncorralated
 6.  Errors are normally distributed
 
 Assumptions 3-6 can be shown if:
