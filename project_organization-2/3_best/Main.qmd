@@ -1,5 +1,12 @@
 ------------------------------------------------------------------------
 
+**Prediction of glucose using linear regression.**
+
+Demi van den Biggelaar (9660089)\
+August Gesthuizen (?)\
+Friso Harff (7526946)\
+Leander van der Waal (7180063)\
+
 1 in 14 Dutch citizens has diabetes (Cijfers Over Diabetes, z.d.). To treat diabetes more effective and to prevent serious complications it is crucial to diagnose it as early as possible. Having diabetes means that there is a shortage of insulin in the body, causing glucose to stay in the blood instead, which can cause a range of complications (Umcu, z.d.). Diabetes can be diagnosed by measuring the plasma glucose concentration in the blood (Diabetes Mellitus Type 2 \| LUMC, z.d.). To diagnose diabetes faster we want to know if we can predict glucose levels based on other parameters.
 
 To see if this is possible we use a dataset about diabetes and we use the different parameters to verify whether we can predict glucose (Akturk & National Institute of Diabetes and Digestive and Kidney Diseases, 2020). The data is filtered on only females of at least 21 years of age from a Pima Indian heritage.
@@ -69,7 +76,7 @@ for (i in 1:ncol(dataRDS)) {
   col_name <- colnames(dataRDS)[i]
   print(hist(dataRDS[, i],
        main = paste("Histogram of ", col_name),
-       xlab = paste("Column", i),
+       xlab = paste("Values of", col_name),
        col = "lightblue",
        border = "white"))
 }
@@ -148,9 +155,6 @@ ggplot(dataRDS, aes(x = moderation, y = Glucose)) +
 
 ```
 
-1.  **Assumptions:** Testing of model assumptions, checking for influential cases. Act upon and/or reflect on violations when needed.
-2.  **Model estimation:** Description of the model estimates, model fit, and model comparison procedure (including moderation)
-
 ```{r}
 # Assumptions are: linearity, Exogenous predictors, constant finite error variance Predictor matrix full rank, independent errors, normal distributed errors.
 
@@ -179,9 +183,54 @@ ggplot(dataRDS, aes(x = factor(moderation), y = Glucose)) +
   geom_boxplot() +
   labs(title = "Glucose Distribution by Moderation")
 
+errors <- dataRDS$Glucose - predict(model3)
+squared <- errors^2
+MSE <- mean(squared)
 vif(model3)
 ```
 
+1.  Model is linear in the parameters: This holds for our values are static and non exponential as seen here:
+
+```         
+Intercept.     7.408e+01  
+Age            6.592e-01  
+Insulin        6.762e-02  
+BMI            6.838e+00  
+SkinThickness -3.211e-01  
+moderation     3.965e-06
+```
+
+2.  Predictor model is full rank:
+
+```{r}
+# turns model to matrix
+X <- model.matrix(model3)
+
+# Compares the rank to the amount of columns in the predictor matrix
+qr(X)$rank == ncol(X)
+```
+
+2.  --
+3.  Predictors are strictly exogenous:\
+    - i.e. the predictors do not corrolate with the errors
+4.  The errors have constant, finite variance
+5.  Errors are uncorrolated
+6.  Errors are normally distributed
+
+Assumptions 3-6 can be shown if:
+
+![](images/clipboard-811635372.png)
+
+```{r}
+cov(predict(model3),errors)
+
+hist(errors,
+       main = paste("Histogram of"),
+       xlab = paste("Values of"))
+```
+
+\
+\
 For the assumptions of the linear regression we checked for linearity, normal distribution, homoscedasticity, multicollinearity, and outliers. We checked for linearity ... . Normal distribution was found in both a K-S test (...) and through the use of a histogram, which showed a nice curve with perhaps the tiniest skewing on the left side. Homoscedasticity was assessed and confirmed by plotting the predicted values against the residuals, with no clear funnel or other deviant pattern being observed. Multicollinearity was checked through VIF tests (...). Lastly, there were x outliers found.
 
 ```{r}
