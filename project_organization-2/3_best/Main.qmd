@@ -241,11 +241,17 @@ A multiple linear regression was conducted to examine the predictors for glucose
 
 In model 3, an ANOVA was done to look at the level of prediction of age, insulin, BMI, and skin thickness on glucose levels, and whether this association was influenced by the moderation term. The model shows that the interaction term significantly influences the relationship between the predictors and glucose levels (F(1, 762) = 4.91, p \> .027). This means that the relationship between one of the predictors and glucose levels differs depending on the level of the moderator.
 
+**Conclusion**
+
+For our research, we wanted to answer the question if we can predict glucose levels on the basis of several predictors and a moderation. The results indicate that age, insulin levels and BMI have a positive relation with glucose: as these factors increase, glucose levels will increase with. Skin thickness, however, has a negative effect, meaning that individuals with thinner skin tend to have higher glucose levels. Although the moderator had an effect, this effect was small to such an extend that it is unlikely it will have any meaningful practical impact.
+
+Overall, the findings suggest that glucose levels can be understood through the different predictors included in the model, while the moderator does not contribute in a meaningful way.
+
 **References**
 
 Cijfers over diabetes. (n.d.). diabetes.nl. https://www.diabetes.nl/wat-is-diabetes/over-diabetes/cijfers-over-diabetes
 
-Cijfers over diabetes. (n.d.). diabetes.nl. https://www.diabetes.nl/wat-is-diabetes/over-diabetes/cijfers-over-diabetes
+Cijfers over diabetes. (n.d.). diabetes.nl. https://www.diabetes.nl/wat-is-diabetes/over-diabetes/cijfers- over-diabetes
 
 Diabetes Mellitus type 2 \| LUMC. (n.d.). https://www.lumc.nl/afdelingen/endocrinologie/ziektes-en-aandoeningen/diabetes-mellitus-type-2/
 
