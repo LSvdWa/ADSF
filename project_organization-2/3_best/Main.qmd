@@ -219,7 +219,7 @@ qr(X)$rank == ncol(X)
 
 Assumptions 3-6 can be shown if:
 
-![](images/clipboard-811635372.png)
+$\varepsilon \stackrel{idd}{\sim} N(O,\sigma^2)$
 
 ```{r}
 cov(predict(model3),errors)
@@ -253,8 +253,6 @@ For our research, we wanted to answer the question if we can predict glucose lev
 Overall, the findings suggest that glucose levels can be understood through the different predictors included in the model, while the moderator does not contribute in a meaningful way.
 
 **References**
-
-Cijfers over diabetes. (n.d.). diabetes.nl. https://www.diabetes.nl/wat-is-diabetes/over-diabetes/cijfers-over-diabetes
 
 Cijfers over diabetes. (n.d.). diabetes.nl. https://www.diabetes.nl/wat-is-diabetes/over-diabetes/cijfers- over-diabetes
 
