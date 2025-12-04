@@ -212,7 +212,7 @@ qr(X)$rank == ncol(X)
 
 2.  --
 3.  Predictors are strictly exogenous:\
-    - i.e. the predictors do not corrolate with the errors
+    -   i.e. the predictors do not corrolate with the errors
 4.  The errors have constant, finite variance
 5.  Errors are uncorrolated
 6.  Errors are normally distributed
@@ -224,9 +224,14 @@ Assumptions 3-6 can be shown if:
 ```{r}
 cov(predict(model3),errors)
 
-hist(errors,
-       main = paste("Histogram of"),
-       xlab = paste("Values of"))
+# Check if the model is normally distributed
+plot(model3, which = 2)
+# shapiro test is significant so its normally distributed
+shapiro.test(residuals(model))
+
+#residuals plot
+plot(fitted(model3), resid(model3)) + abline(h=0, col="pink")
+
 ```
 
 \
