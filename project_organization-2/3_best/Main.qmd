@@ -33,7 +33,7 @@ The different parameters in the dataset are:
 
 -   Outcome: Class variable (0 or 1, where 1 means positive for diabetes)
 
-**Preprocessing**
+**Preprocessing & Loading data**
 
 To preprocess the data we categorized the BMI into four categories, being underweight, healthy, overweight and obese. We have kept all the data, because there were not many missing values or flukes in the data.
 
@@ -79,6 +79,8 @@ dataRDS$moderation <- dataRDS$BMI * dataRDS$Insulin * dataRDS$SkinThickness * (d
 summary(dataset)
 ```
 
+**Exploring the data**
+
 ```{r}
 #| warning: false
 
@@ -116,13 +118,17 @@ Above you can see multiple ways that our variables are described. They are repre
 
 -   **Moderation:** Product of the following values: BMI, Insulin, SkinThickness and BloodPressure. This value is added to support the regression accuracy.
 
+**Building the model**
+
 ```{r}
 #| warning: false
-
+# model with all columns as predictors
 model <- lm(Glucose ~ Age + Insulin + BMI + Pregnancies + BloodPressure + SkinThickness + DiabetesPedigreeFunction + moderation, 
              data = dataRDS)
+# model with all predictor p < 0.05 
 model2 <- lm(Glucose ~ Age + Insulin + BMI + SkinThickness + moderation + DiabetesPedigreeFunction, 
              data = dataRDS)
+# model with all predictors p < 0.01 and moderation
 model3 <- lm(Glucose ~ Age + Insulin + BMI + SkinThickness + moderation, 
              data = dataRDS)
 
@@ -131,6 +137,7 @@ summary(model)
 summary(model2)
 summary(model3)
 
+# anova model to compare models
 anova(model, model2, model3)
 
 
@@ -168,10 +175,10 @@ ggplot(dataRDS, aes(x = moderation, y = Glucose)) +
 
 ```
 
+**Boxplots for each predictor**
+
 ```{r}
 #| warning: false
-
-# Assumptions are: linearity, Exogenous predictors, constant finite error variance, Predictor matrix full rank, independent errors, normal distributed errors.
 
 # Boxplot for Age vs Glucose
 ggplot(dataRDS, aes(x = factor(Age), y = Glucose)) +
@@ -203,6 +210,8 @@ squared <- errors^2
 MSE <- mean(squared)
 vif(model3)
 ```
+
+**Assumptions**
 
 1.  Model is linear in the parameters: This holds for our values are static and non exponential as seen here:
 
@@ -256,6 +265,8 @@ plot(fitted(model3), resid(model3)) + abline(h=0, col="pink")
 \
 \
 For the assumptions of the linear regression we checked for linearity, normal distribution, homoscedasticity, multicollinearity, and outliers. We checked for linearity ... . Normal distribution was found in both a K-S test (...) and through the use of a histogram, which showed a nice curve with perhaps the tiniest skewing on the left side. Homoscedasticity was assessed and confirmed by plotting the predicted values against the residuals, with no clear funnel or other deviant pattern being observed. Multicollinearity was checked through VIF tests (...). Lastly, there were x outliers found.
+
+**Exploring the model**
 
 ```{r}
 #| warning: false
