@@ -313,7 +313,7 @@ summary(model3)
 
 A multiple linear regression was conducted to examine the predictors for glucose levels. This was done through the use of age, insulin, BMI, skin thickness, and a moderation variable. The overall model was significant (F(5, 387) = 50.39, p \> .01) and explains 39.4% of the variance in glucose (R² = .3934). Age has a positive effect on glucose levels where older individuals have a higher glucose level (𝛽 = .65, p \< .01). The same is true for insulin levels (𝛽 = .12, p \< .01) where insulin increases when glucose increases. However, both BMI (𝛽 = 2.55, p = .23) and skin thickness (𝛽 = .042, p = .82), although showing a positive effect, are both not significant. The moderation effect is also insignificant (𝛽 = 1.207e-06, p = .60). Overall, the results suggest that only age and insulin contribute meaningfully to glucose level variation.
 
-In model 3, an ANOVA was done to look at the level of prediction of age, insulin, BMI, and skin thickness on glucose levels, and whether this association was influenced by the moderation term. The model shows that the interaction term significantly influences the relationship between the predictors and glucose levels (F(1, 762) = 4.91, p \> .027). This means that the relationship between one of the predictors and glucose levels differs depending on the level of the moderator.
+In model 3, an ANOVA was done to look at the significance of age, insulin, BMI, and skin thickness on glucose levels, and whether this association was influenced by the moderation term. The model showed that the interaction term does not influence the relationship between the predictors and glucose levels (F(1, 387) = 1.38, p \> .241).
 
 ## **Conclusion**
 
