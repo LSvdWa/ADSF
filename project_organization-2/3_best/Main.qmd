@@ -247,14 +247,6 @@ X <- model.matrix(model3)
 qr(X)$rank == ncol(X)
 ```
 
-3.  Predictors are strictly exogenous:
-    -   i.e. the predictors do not correlate with the errors
-4.  The errors have constant, finite variance
-5.  Errors are uncorrelated
-6.  Errors are normally distributed
-
-Assumptions 3-6 can be shown if: $\varepsilon \stackrel{idd}{\sim} N(O,\sigma^2)$
-
 ```{r}
 #| warning: false
 
@@ -297,11 +289,11 @@ abline(h = 0, col = "forestgreen")
 
 # Density plot for normally distributed errors check
 densityPlot(errors,
-       main = paste("Histogram of errors"),
+       main = paste("Density plot of errors"),
        xlab = paste("error values"))
 ```
 
-For the assumptions of the linear regression model we checked for linearity, homoscedasticity, normal distribution, and correlated errors. The Q-Q plot and density plot analysis suggested a potential risk for violation of the normality assumption of residuals. The can be seen in the Q-Q plot by the upper tail deviating from the dotted line and in the density plot by a slight skewing on the right of the distribution. A Shapiro-Wilk test was performed on the residuals which resulted in the test statistic W = 0.97, *p \< .05*. Normality assumption of residuals was thus not rejected. Homoscedasticity was assessed by plotting the residuals. Visual inspection of the residuals suggested heteroscedasticity with an increase in spread of the residuals at higher predicted values. The Durbin-Watson test was run to look for autocorrelation of the errors and showed a test statistic of DW ≈ 2, indicating no autocorrelation in the residuals. Finally, for the correlation of errors, we ran individual visual analyses for every predicting variable. Age, insulin, and skin thickness all suggest no correlation. BMI, however, visibly increased together with the errors. This could be explained by BMI not being a continuous variable, the grouping of the variable resulting in an uneven distribution of data points, and thus showing a correlation with the errors.
+The other four assumptions of the linear regression model that were checked are linearity, homoscedasticity, normal distribution, and correlated errors. The Q-Q plot and density plot analysis suggested a potential risk for violation of the normality assumption of residuals. The can be seen in the Q-Q plot by the upper tail deviating from the dotted line and in the density plot by a slight skewing on the right of the distribution. A Shapiro-Wilk test was performed on the residuals which resulted in the test statistic W = 0.97, *p \< .05*. Normality assumption of residuals was thus not rejected. Homoscedasticity was assessed by plotting the residuals. Visual inspection of the residuals suggested heteroscedasticity with an increase in spread of the residuals at higher predicted values. The Durbin-Watson test was run to look for autocorrelation of the errors and showed a test statistic of DW ≈ 2, indicating no autocorrelation in the residuals. Finally, for the correlation of errors, we ran individual visual analyses for every predicting variable. Age, insulin, and skin thickness all suggest no correlation. BMI, however, visibly increased together with the errors. This could be explained by BMI not being a continuous variable, the grouping of the variable resulting in an uneven distribution of data points, and thus showing a correlation with the errors.
 
 ## **Exploring the model**
 
