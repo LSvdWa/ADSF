@@ -1,3 +1,13 @@
+---
+title: "Prediction of glucose using linear regression"
+format: 
+  html: 
+    toc: true
+    toc-location: left
+    toc-expand: true
+warning: false
+---
+
 ------------------------------------------------------------------------
 
 # **Prediction of glucose using linear regression**
@@ -35,18 +45,15 @@ The different parameters in the dataset are:
 
 ## **Preprocessing & Loading data**
 
-To preprocess the data we categorized the BMI into four categories, being underweight, healthy, overweight and obese. We have kept all the data, because there were not many missing values or flukes in the data.
+To preprocess the data we categorized the BMI into four categories, being underweight, healthy, overweight and obese. We removed missing values from Glucose, BMI, SkinThickness and Insulin.  
 
 ```{r}
-#| warning: false
-install.packages('car')
+#install.packages('car')
 ```
 
 ------------------------------------------------------------------------
 
 ```{r}
-#| warning: false
-
 # Initialization
 setwd(".")
 library(ggplot2)
@@ -54,8 +61,6 @@ library(car)
 ```
 
 ```{r}
-#| warning: false
-
 # Load .CSV and save as .RDS
 
 datacsv <- read.csv("./data/raw/diabetes.csv", header = TRUE)
@@ -89,9 +94,6 @@ summary(dataset)
 ## **Exploring the data**
 
 ```{r}
-#| warning: false
-
-dataRDS
 for (i in 1:ncol(dataRDS)) {
   col_name <- colnames(dataRDS)[i]
   print(hist(dataRDS[, i],
@@ -128,7 +130,6 @@ Above you can see multiple ways that our variables are described. They are repre
 ## **Building the model**
 
 ```{r}
-#| warning: false
 # model with all columns as predictors
 model <- lm(Glucose ~ Age + Insulin + BMI + Pregnancies + BloodPressure + SkinThickness + DiabetesPedigreeFunction + moderation, 
              data = dataRDS)
@@ -187,8 +188,6 @@ ggplot(dataRDS, aes(x = moderation, y = Glucose)) +
 These boxplots give insights into the distributions of various parameters.
 
 ```{r}
-#| warning: false
-
 # Boxplot for Age vs Glucose
 ggplot(dataRDS, aes(x = factor(Age), y = Glucose)) +
   geom_boxplot() +
@@ -238,7 +237,6 @@ moderation     3.965e-06
 2.  Predictor model is full rank:
 
 ```{r}
-#| warning: false
 # turns model to matrix
 X <- model.matrix(model3)
 
@@ -248,8 +246,6 @@ qr(X)$rank == ncol(X)
 ```
 
 ```{r}
-#| warning: false
-
 # Check for normality
 plot(model3, which = 2)
 
@@ -298,8 +294,6 @@ The other four assumptions of the linear regression model that were checked are 
 ## **Exploring the model**
 
 ```{r}
-#| warning: false
-
 summary(model3)
 ```
 
