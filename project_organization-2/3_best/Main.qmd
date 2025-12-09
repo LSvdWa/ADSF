@@ -1,11 +1,13 @@
-------------------------------------------------------------------------
-
-# **Prediction of glucose using linear regression**
-
-Demi van den Biggelaar (9660089)\
-August Gesthuizen (5292565)\
-Friso Harff (7526946)\
-Leander van der Waal (7180063)\
+---
+title:  "Predicting glucose"
+authors:  
+- "Demi van den Biggelaar (9660089)"
+- "August Gesthuizen (5292565)"
+- "Friso Harff (7526946)"
+- "Leander van der Waal (7180063)"
+date:  "2025-12-08"
+format:  "html"
+---
 
 ## **Introduction**
 
@@ -36,13 +38,6 @@ The different parameters in the dataset are:
 ## **Preprocessing & Loading data**
 
 To preprocess the data we categorized the BMI into four categories, being underweight, healthy, overweight and obese. We have kept all the data, because there were not many missing values or flukes in the data.
-
-```{r}
-#| warning: false
-install.packages('car')
-```
-
-------------------------------------------------------------------------
 
 ```{r}
 #| warning: false
@@ -178,7 +173,7 @@ ggplot(dataRDS, aes(x = moderation, y = Glucose)) +
   geom_smooth(method = "lm", se = FALSE) +
   labs(title = "Linear Relationship between Moderation and Glucose")
 
-
+getwd()
 
 ```
 
