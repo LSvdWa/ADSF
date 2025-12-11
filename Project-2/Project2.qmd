@@ -1,3 +1,16 @@
+---
+title: "Predicting Diabetes"
+authors:
+- Demi van den Biggelaar (9660089)
+- "August Gesthuizen (5292565)"
+- "Friso Harff (7526946)"
+- "Leander van der Waal (7180063)"
+date: "2026-01-15"
+format:
+  html:
+    embed-resources: true
+---
+
 # **Prediction of glucose using linear regression**
 
 Demi van den Biggelaar (9660089)\
@@ -6,10 +19,6 @@ Friso Harff (7526946)\
 Leander van der Waal (7180063)\
 
 ## **Introduction**
-
-1 in 14 Dutch citizens has diabetes (Cijfers Over Diabetes, z.d.). To treat diabetes more effectively and to prevent serious complications it is crucial to diagnose it as early as possible. Having diabetes means that there is a shortage of insulin in the body, causing glucose to stay in the blood instead, which can cause a range of complications (Umcu, z.d.). Diabetes can be diagnosed by measuring the plasma glucose concentration in the blood (Diabetes Mellitus Type 2 \| LUMC, z.d.). To diagnose diabetes faster we want to know if we can predict glucose levels based on other parameters.
-
-To see if this is possible we use a dataset about diabetes and we use the different parameters to verify whether we can predict glucose (Akturk & National Institute of Diabetes and Digestive and Kidney Diseases, 2020). The data is filtered on only females of at least 21 years of age from a Pima Indian heritage.
 
 The different parameters in the dataset are:
 
@@ -33,18 +42,11 @@ The different parameters in the dataset are:
 
 ## **Preprocessing & Loading data**
 
-To preprocess the data we categorized the BMI into four categories, being underweight, healthy, overweight and obese. We have kept all the data, because there were not many missing values or flukes in the data.
-
-```{r}
-#| warning: false
-install.packages('car')
-```
+To preprocess the data we categorized the BMI into four categories, being underweight, healthy, overweight and obese.
 
 ------------------------------------------------------------------------
 
 ```{r}
-#| warning: false
-
 # Initialization
 setwd(".")
 library(ggplot2)
