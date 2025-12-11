@@ -1,0 +1,102 @@
+# **Prediction of glucose using linear regression**
+
+Demi van den Biggelaar (9660089)\
+August Gesthuizen (5292565)\
+Friso Harff (7526946)\
+Leander van der Waal (7180063)\
+
+## **Introduction**
+
+1 in 14 Dutch citizens has diabetes (Cijfers Over Diabetes, z.d.). To treat diabetes more effectively and to prevent serious complications it is crucial to diagnose it as early as possible. Having diabetes means that there is a shortage of insulin in the body, causing glucose to stay in the blood instead, which can cause a range of complications (Umcu, z.d.). Diabetes can be diagnosed by measuring the plasma glucose concentration in the blood (Diabetes Mellitus Type 2 \| LUMC, z.d.). To diagnose diabetes faster we want to know if we can predict glucose levels based on other parameters.
+
+To see if this is possible we use a dataset about diabetes and we use the different parameters to verify whether we can predict glucose (Akturk & National Institute of Diabetes and Digestive and Kidney Diseases, 2020). The data is filtered on only females of at least 21 years of age from a Pima Indian heritage.
+
+The different parameters in the dataset are:
+
+-   Pregnancies: Number of times pregnant
+
+-   Glucose: Plasma glucose concentration after 2 hours in an oral glucose tolerance test
+
+-   BloodPressure: Diastolic blood pressure (mm Hg)
+
+-   SkinThickness: Triceps skin fold thickness (mm)
+
+-   Insulin: 2-Hour serum insulin (mu U/ml)
+
+-   BMI: Body mass index (weight in kg/(height in m)\^2)
+
+-   DiabetesPedigreeFunction: Diabetes pedigree function
+
+-   Age: Age (years)
+
+-   Outcome: Class variable (0 or 1, where 1 means positive for diabetes)
+
+## **Preprocessing & Loading data**
+
+To preprocess the data we categorized the BMI into four categories, being underweight, healthy, overweight and obese. We have kept all the data, because there were not many missing values or flukes in the data.
+
+```{r}
+#| warning: false
+install.packages('car')
+```
+
+------------------------------------------------------------------------
+
+```{r}
+#| warning: false
+
+# Initialization
+setwd(".")
+library(ggplot2)
+library(car)
+```
+
+```{r}
+#| warning: false
+
+# Load .CSV and save as .RDS
+
+datacsv <- read.csv("./data/raw/diabetes.csv", header = TRUE)
+saveRDS(datacsv, "./data/raw/dataset.rds")
+
+# Preprocessing
+dataRDS <- readRDS("./data/raw/dataset.rds")
+dataRDS <- na.omit(dataRDS) # removes NA from important columns
+saveRDS(dataRDS, "./data/processed/dataset.rds")
+dataset <- readRDS("./data/processed/dataset.rds")
+
+# Recoding BMI to classes
+dataRDS$BMI[dataRDS$BMI <= 18.5 ] <- 1
+dataRDS$BMI[dataRDS$BMI > 18.5 & dataRDS$BMI <= 25  ] <- 2
+dataRDS$BMI[dataRDS$BMI > 25 & dataRDS$BMI <= 30 ] <- 3
+dataRDS$BMI[dataRDS$BMI > 30] <- 4
+
+# Removing missing values
+dataRDS <- subset(dataRDS,
+                     Glucose != 0 &
+                     Insulin != 0 &
+                     BMI != 0 &
+                     SkinThickness != 0)
+
+# Adding moderation
+dataRDS$moderation <- dataRDS$BMI * dataRDS$Insulin * dataRDS$SkinThickness * (dataRDS$BloodPressure) 
+
+summary(dataset)
+```
+
+## **Exploring the data**
+
+```{r}
+#| warning: false
+
+dataRDS
+for (i in 1:ncol(dataRDS)) {
+  col_name <- colnames(dataRDS)[i]
+  print(hist(dataRDS[, i],
+       main = paste("Histogram of ", col_name),
+       xlab = paste("Values of", col_name),
+       col = "lightblue",
+       border = "white"))
+}
+pairs(dataRDS)
+```
