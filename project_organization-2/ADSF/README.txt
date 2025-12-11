@@ -1,0 +1,1 @@
+All required components of the exercise are able to be found within the main.qmd file, when run this will give a complete overview of all findings.

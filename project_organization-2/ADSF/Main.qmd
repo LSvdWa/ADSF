@@ -1,0 +1,320 @@
+------------------------------------------------------------------------
+
+# **Prediction of glucose using linear regression**
+
+Demi van den Biggelaar (9660089)\
+August Gesthuizen (5292565)\
+Friso Harff (7526946)\
+Leander van der Waal (7180063)\
+
+## **Introduction**
+
+1 in 14 Dutch citizens has diabetes (Cijfers Over Diabetes, z.d.). To treat diabetes more effectively and to prevent serious complications it is crucial to diagnose it as early as possible. Having diabetes means that there is a shortage of insulin in the body, causing glucose to stay in the blood instead, which can cause a range of complications (Umcu, z.d.). Diabetes can be diagnosed by measuring the plasma glucose concentration in the blood (Diabetes Mellitus Type 2 \| LUMC, z.d.). To diagnose diabetes faster we want to know if we can predict glucose levels based on other parameters.
+
+To see if this is possible we use a dataset about diabetes and we use the different parameters to verify whether we can predict glucose (Akturk & National Institute of Diabetes and Digestive and Kidney Diseases, 2020). The data is filtered on only females of at least 21 years of age from a Pima Indian heritage.
+
+The different parameters in the dataset are:
+
+-   Pregnancies: Number of times pregnant
+
+-   Glucose: Plasma glucose concentration after 2 hours in an oral glucose tolerance test
+
+-   BloodPressure: Diastolic blood pressure (mm Hg)
+
+-   SkinThickness: Triceps skin fold thickness (mm)
+
+-   Insulin: 2-Hour serum insulin (mu U/ml)
+
+-   BMI: Body mass index (weight in kg/(height in m)\^2)
+
+-   DiabetesPedigreeFunction: Diabetes pedigree function
+
+-   Age: Age (years)
+
+-   Outcome: Class variable (0 or 1, where 1 means positive for diabetes)
+
+## **Preprocessing & Loading data**
+
+To preprocess the data we categorized the BMI into four categories, being underweight, healthy, overweight and obese. We have kept all the data, because there were not many missing values or flukes in the data.
+
+```{r}
+#| warning: false
+install.packages('car')
+```
+
+------------------------------------------------------------------------
+
+```{r}
+#| warning: false
+
+# Initialization
+setwd(".")
+library(ggplot2)
+library(car)
+```
+
+```{r}
+#| warning: false
+
+# Load .CSV and save as .RDS
+
+datacsv <- read.csv("./data/raw/diabetes.csv", header = TRUE)
+saveRDS(datacsv, "./data/raw/dataset.rds")
+
+# Preprocessing
+dataRDS <- readRDS("./data/raw/dataset.rds")
+dataRDS <- na.omit(dataRDS) # removes NA from important columns
+saveRDS(dataRDS, "./data/processed/dataset.rds")
+dataset <- readRDS("./data/processed/dataset.rds")
+
+# Recoding BMI to classes
+dataRDS$BMI[dataRDS$BMI <= 18.5 ] <- 1
+dataRDS$BMI[dataRDS$BMI > 18.5 & dataRDS$BMI <= 25  ] <- 2
+dataRDS$BMI[dataRDS$BMI > 25 & dataRDS$BMI <= 30 ] <- 3
+dataRDS$BMI[dataRDS$BMI > 30] <- 4
+
+# Removing missing values
+dataRDS <- subset(dataRDS,
+                     Glucose != 0 &
+                     Insulin != 0 &
+                     BMI != 0 &
+                     SkinThickness != 0)
+
+# Adding moderation
+dataRDS$moderation <- dataRDS$BMI * dataRDS$Insulin * dataRDS$SkinThickness * (dataRDS$BloodPressure) 
+
+summary(dataset)
+```
+
+## **Exploring the data**
+
+```{r}
+#| warning: false
+
+dataRDS
+for (i in 1:ncol(dataRDS)) {
+  col_name <- colnames(dataRDS)[i]
+  print(hist(dataRDS[, i],
+       main = paste("Histogram of ", col_name),
+       xlab = paste("Values of", col_name),
+       col = "lightblue",
+       border = "white"))
+}
+pairs(dataRDS)
+```
+
+Above you can see multiple ways that our variables are described. They are represented in two ways: using histograms and using.a panel. In the histograms you can see which values are representative of each variable while in the panel you can see the relation between of each variable with each other variable. The histograms will be briefly discussed, however remaining discussion will focus only on the relevant plots from the panel which we use for regression.
+
+-   **Pregnancies:** number of times pregnant, represented as an integer, values range between 0-14
+
+-   **Glucose:** plasma glucose concentration in a toleration test represented as an integer, values range from 56-198.
+
+-   **BloodPressure:** Bloodpressure represented as an integer with values in the range of 24-110.
+
+-   **Skinthickness:** Thickness of the skin in millimetres, represented as an integer with values ranging from 7-63.
+
+-   **Insulin:** “2 hour serum insulin” with values ranging from 14-846.
+
+-   **BMI:** BMI value represented as classification, namely: underweight=1, healthy=2, overweight=3 and obese=4. Most people in this study are considered to be obese.
+
+-   **DiabetesPedigreeFunction:** Quantified genetic risk of diabetes. Risks range from 0-1,75. 
+
+-   **Age:** Integer representing age, values range from 20-70.
+
+-   **Outcome:** 0 or 1 value representing if someone has diabetes or not. Most participants don’t have diabetes.
+
+-   **Moderation:** Product of the following values: BMI, Insulin, SkinThickness and BloodPressure. This value is added to support the regression accuracy.
+
+## **Building the model**
+
+```{r}
+#| warning: false
+# model with all columns as predictors
+model <- lm(Glucose ~ Age + Insulin + BMI + Pregnancies + BloodPressure + SkinThickness + DiabetesPedigreeFunction + moderation, 
+             data = dataRDS)
+# model with all predictor p < 0.05 
+model2 <- lm(Glucose ~ Age + Insulin + BMI + SkinThickness + moderation + DiabetesPedigreeFunction, 
+             data = dataRDS)
+# model with all predictors p < 0.01 and moderation
+model3 <- lm(Glucose ~ Age + Insulin + BMI + SkinThickness + moderation, 
+             data = dataRDS)
+
+# Ask for summary statistics again
+summary(model)
+summary(model2)
+summary(model3)
+
+# anova model to compare models
+anova(model, model2, model3)
+
+
+# Plot with regression line for x1
+ggplot(dataRDS, aes(x = Age, y = Glucose)) +
+  geom_point() +
+  geom_smooth(method = "lm", se = FALSE) + # se = FALSE to hide confidence interval
+  labs(title = "Linear Relationship between Age and Glucose")
+
+# Plot with regression line for x2
+ggplot(dataRDS, aes(x = Insulin, y = Glucose)) +
+  geom_point() +
+  geom_smooth(method = "lm", se = FALSE) +
+  labs(title = "Linear Relationship between Insulin and Glucose")
+
+# Plot with regression line for x1
+ggplot(dataRDS, aes(x = SkinThickness, y = Glucose)) +
+  geom_point() +
+  geom_smooth(method = "lm", se = FALSE) + # se = FALSE to hide confidence interval
+  labs(title = "Linear Relationship between Skin thickness and Glucose")
+
+# Plot with regression line for x2
+ggplot(dataRDS, aes(x = BMI, y = Glucose)) +
+  geom_point() +
+  geom_smooth(method = "lm", se = FALSE) +
+  labs(title = "Linear Relationship between BMI and Glucose")
+
+# Plot with regression line for x2
+ggplot(dataRDS, aes(x = moderation, y = Glucose)) +
+  geom_point() +
+  geom_smooth(method = "lm", se = FALSE) +
+  labs(title = "Linear Relationship between Moderation and Glucose")
+
+
+
+```
+
+## **Boxplots for each predictor**
+
+These boxplots give insights into the distributions of various parameters.
+
+```{r}
+#| warning: false
+
+# Boxplot for Age vs Glucose
+ggplot(dataRDS, aes(x = factor(Age), y = Glucose)) +
+  geom_boxplot() +
+  labs(title = "Glucose Distribution by Age")
+
+# Boxplot for Insulin vs Glucose
+ggplot(dataRDS, aes(x = factor(Insulin), y = Glucose)) +
+  geom_boxplot() +
+  labs(title = "Glucose Distribution by Insulin Level")
+
+# Boxplot for SkinThickness vs Glucose
+ggplot(dataRDS, aes(x = factor(SkinThickness), y = Glucose)) +
+  geom_boxplot() +
+  labs(title = "Glucose Distribution by Skin Thickness")
+
+# Boxplot for BMI vs Glucose
+ggplot(dataRDS, aes(x = factor(BMI), y = Glucose)) +
+  geom_boxplot() +
+  labs(title = "Glucose Distribution by BMI")
+
+# Boxplot for Moderation vs Glucose, moet maar over geargumenteerd worden
+ggplot(dataRDS, aes(x = factor(moderation), y = Glucose)) +
+  geom_boxplot() +
+  labs(title = "Glucose Distribution by Moderation")
+
+errors <- dataRDS$Glucose - predict(model3)
+squared <- errors^2
+MSE <- mean(squared)
+vif(model3)
+```
+
+## **Assumptions**
+
+To be able to use a multiple linear regression model to predict, we need to verify that it satisfies all assumptions necessary.
+
+1.  Model is linear in the parameters: This holds for our values are static and non exponential as seen here:
+
+```         
+Intercept.     7.408e+01  
+Age            6.592e-01  
+Insulin        6.762e-02  
+BMI            6.838e+00  
+SkinThickness -3.211e-01  
+moderation     3.965e-06
+```
+
+2.  Predictor model is full rank:
+
+```{r}
+#| warning: false
+# turns model to matrix
+X <- model.matrix(model3)
+
+# Compares the rank to the amount of columns in the predictor matrix
+# if True, the predictor matrix is full rank
+qr(X)$rank == ncol(X)
+```
+
+```{r}
+#| warning: false
+
+# Check for normality
+plot(model3, which = 2)
+
+# shapiro test for significance values of normality check
+shapiro.test(residuals(model3))
+
+#residuals plot for homoscedasticity check and variance of errors
+plot(fitted(model3), resid(model3)) + abline(h=0, col="pink")
+
+# durbin watson test for extra check on error correlation
+durbinWatsonTest(model3)
+
+# Checking for correlated errors for all the predictor variables
+plot(dataRDS$Age, resid(model3),
+     xlab = "Age",
+     ylab = "Residuals",
+     main = "Residuals vs Age")
+abline(h = 0, col = "forestgreen")
+
+plot(dataRDS$Insulin, resid(model3),
+     xlab = "Insulin",
+     ylab = "Residuals",
+     main = "Residuals vs Insulin")
+abline(h = 0, col = "forestgreen")
+
+plot(dataRDS$BMI, resid(model3),
+     xlab = "BMI",
+     ylab = "Residuals",
+     main = "Residuals vs BMI")
+abline(h = 0, col = "forestgreen")
+
+plot(dataRDS$SkinThickness, resid(model3),
+     xlab = "SkinThickness",
+     ylab = "Residuals",
+     main = "Residuals vs SkinThickness")
+abline(h = 0, col = "forestgreen")
+
+# Density plot for normally distributed errors check
+densityPlot(errors,
+       main = paste("Density plot of errors"),
+       xlab = paste("error values"))
+```
+
+The other four assumptions of the linear regression model that were checked are linearity, homoscedasticity, normal distribution, and correlated errors. The Q-Q plot and density plot analysis suggested a potential risk for violation of the normality assumption of residuals. The can be seen in the Q-Q plot by the upper tail deviating from the dotted line and in the density plot by a slight skewing on the right of the distribution. A Shapiro-Wilk test was performed on the residuals which resulted in the test statistic W = 0.97, *p \< .05*. Normality assumption of residuals was thus not rejected. Homoscedasticity was assessed by plotting the residuals. Visual inspection of the residuals suggested heteroscedasticity with an increase in spread of the residuals at higher predicted values. The Durbin-Watson test was run to look for autocorrelation of the errors and showed a test statistic of DW ≈ 2, indicating no autocorrelation in the residuals. Finally, for the correlation of errors, we ran individual visual analyses for every predicting variable. Age, insulin, and skin thickness all suggest no correlation. BMI, however, visibly increased together with the errors. This could be explained by BMI not being a continuous variable, the grouping of the variable resulting in an uneven distribution of data points, and thus showing a correlation with the errors.
+
+## **Exploring the model**
+
+```{r}
+#| warning: false
+
+summary(model3)
+```
+
+A multiple linear regression was conducted to examine the predictors for glucose levels. This was done through the use of age, insulin, BMI, skin thickness, and a moderation variable. The overall model was significant (F(5, 387) = 50.39, p \> .01) and explains 39.4% of the variance in glucose (R² = .3934). Age has a positive effect on glucose levels where older individuals have a higher glucose level (𝛽 = .65, p \< .01). The same is true for insulin levels (𝛽 = .12, p \< .01) where insulin increases when glucose increases. However, both BMI (𝛽 = 2.55, p = .23) and skin thickness (𝛽 = .042, p = .82), although showing a positive effect, are both not significant. The moderation effect is also insignificant (𝛽 = 1.207e-06, p = .60). Overall, the results suggest that only age and insulin contribute meaningfully to glucose level variation.
+
+In model 3, an ANOVA was done to look at the significance of age, insulin, BMI, and skin thickness on glucose levels, and whether this association was influenced by the moderation term. The model showed that the interaction term does not influence the relationship between the predictors and glucose levels (F(1, 387) = 1.38, p \> .241).
+
+## **Conclusion**
+
+To answer our research question, the results indicate that glucose levels can be predicted by age and insulin, which both showed a positive relation with glucose: as age and insulin increase, glucose levels will also increase. BMI, skin thickness and the moderator did not predict glucose. This highlights that, within this sample, glucose levels are in part accounted for by insulin levels and age rather than body composition or the proposed moderation effect.
+
+Cijfers over diabetes. (n.d.). diabetes.nl. https://www.diabetes.nl/wat-is-diabetes/over-diabetes/cijfers- over-diabetes
+
+Diabetes Mellitus type 2 \| LUMC. (n.d.). https://www.lumc.nl/afdelingen/endocrinologie/ziektes-en-aandoeningen/diabetes-mellitus-type-2/
+
+Umcu. (n.d.). Diabetes. UMC Utrecht. https://www.umcutrecht.nl/nl/ziekte/diabetes
+
+Akturk, M. & National Institute of Diabetes and Digestive and Kidney Diseases. (2020). Diabetes \[Dataset\]. https://www.kaggle.com/datasets/mathchi/diabetes-data-set
