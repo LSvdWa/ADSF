@@ -24,7 +24,7 @@ Leander van der Waal (7180063)\
 
 We want to see if we can predict whether someone has diabetes using logistic regression.
 
-To see if this is possible we use a dataset about diabetes and we use the different parameters to verify whether we can predict diabetes (Akturk & National Institute of Diabetes and Digestive and Kidney Diseases, 2020). The data is filtered on only females of at least 21 years of age from a Pima Indian heritage.
+To see if this is possible we use a dataset about diabetes and we use the different parameters to verify whether we can predict diabetes (Akturk & National Institute of Diabetes and Digestive and Kidney Diseases, 2020). The dataset is filtered on only females of at least 21 years of age from a Pima Indian heritage.
 
 The different parameters in the dataset are:
 
@@ -73,10 +73,18 @@ saveRDS(dataRDS, "./data/processed/dataset.rds")
 dataset <- readRDS("./data/processed/dataset.rds")
 
 # Recoding BMI to classes
-dataRDS$BMI[dataRDS$BMI <= 18.5 ] <- 1
-dataRDS$BMI[dataRDS$BMI > 18.5 & dataRDS$BMI <= 25  ] <- 2
-dataRDS$BMI[dataRDS$BMI > 25 & dataRDS$BMI <= 30 ] <- 3
-dataRDS$BMI[dataRDS$BMI > 30] <- 4
+dataRDS$BMI[dataRDS$BMI <= 18.5 ] <- 1                     # Underweight
+dataRDS$BMI[dataRDS$BMI > 18.5 & dataRDS$BMI <= 25  ] <- 2 # Healthy
+dataRDS$BMI[dataRDS$BMI > 25 & dataRDS$BMI <= 30 ] <- 3    # Overweight
+dataRDS$BMI[dataRDS$BMI > 30] <- 4                         # Obese
+
+# maybe use this to make it into factors instead of integers.
+dataRDS$BMI_cat_num <- cut(
+  dataRDS$BMI,
+  breaks = c(-Inf, 18.5, 25, 30, Inf),
+  labels = c(1, 2, 3, 4),
+  right = TRUE
+)
 
 # Removing missing values
 dataRDS <- subset(dataRDS,
@@ -85,8 +93,9 @@ dataRDS <- subset(dataRDS,
                      Glucose != 0 &
                      Insulin != 0 &
                      BMI != 0)
+
 # Adding moderation
-dataRDS$moderation <- dataRDS$BMI * dataRDS$Insulin * dataRDS$SkinThickness * (dataRDS$BloodPressure) 
+dataRDS$moderation <- dataRDS$BMI * dataRDS$Insulin * dataRDS$SkinThickness * dataRDS$BloodPressure 
 
 summary(dataset)
 ```
