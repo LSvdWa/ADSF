@@ -50,7 +50,6 @@ To preprocess the data we categorized the BMI into four categories, being underw
 # Initialization
 setwd(".")
 library(ggplot2)
-library(car)
 ```
 
 ```{r}
@@ -102,3 +101,61 @@ for (i in 1:ncol(dataRDS)) {
 }
 pairs(dataRDS)
 ```
+
+Above you can see multiple ways that our variables are described. They are represented in two ways: using histograms and using.a panel. In the histograms you can see which values are representative of each variable while in the panel you can see the relation between of each variable with each other variable. The histograms will be briefly discussed, however remaining discussion will focus only on the relevant plots from the panel which we use for regression.
+
+-   **Pregnancies:** number of times pregnant, represented as an integer, values range between 0-14
+
+-   **Glucose:** plasma glucose concentration in a toleration test represented as an integer, values range from 56-198.
+
+-   **BloodPressure:** Bloodpressure represented as an integer with values in the range of 24-110.
+
+-   **Skinthickness:** Thickness of the skin in millimetres, represented as an integer with values ranging from 7-63.
+
+-   **Insulin:** “2 hour serum insulin” with values ranging from 14-846.
+
+-   **BMI:** BMI value represented as classification, namely: underweight=1, healthy=2, overweight=3 and obese=4. Most people in this study are considered to be obese.
+
+-   **DiabetesPedigreeFunction:** Quantified genetic risk of diabetes. Risks range from 0-1,75. 
+
+-   **Age:** Integer representing age, values range from 20-70.
+
+-   **Outcome:** 0 or 1 value representing if someone has diabetes or not. Most participants don’t have diabetes.
+
+-   **Moderation:** Product of the following values: BMI, Insulin, SkinThickness and BloodPressure. This value is added to support the regression accuracy.
+
+## **Building the model**
+
+```{r}
+fit1 <- glm(Outcome ~ Age + Pregnancies + Glucose + BloodPressure + SkinThickness + Insulin + BMI + DiabetesPedigreeFunction + moderation,  
+            data = dataRDS)
+summary(fit1)
+
+fit2 <- glm(Outcome ~ Age + Glucose + BMI + DiabetesPedigreeFunction + moderation,  
+            data = dataRDS)
+summary(fit2)
+
+```
+
+## **Assumptions**
+
+```{r}
+# assumptions
+```
+
+## **Exploring the model**
+
+```{r}
+#| warning: false
+
+```
+
+## **Conclusion**
+
+Cijfers over diabetes. (n.d.). diabetes.nl. https://www.diabetes.nl/wat-is-diabetes/over-diabetes/cijfers- over-diabetes
+
+Diabetes Mellitus type 2 \| LUMC. (n.d.). https://www.lumc.nl/afdelingen/endocrinologie/ziektes-en-aandoeningen/diabetes-mellitus-type-2/
+
+Umcu. (n.d.). Diabetes. UMC Utrecht. https://www.umcutrecht.nl/nl/ziekte/diabetes
+
+Akturk, M. & National Institute of Diabetes and Digestive and Kidney Diseases. (2020). Diabetes \[Dataset\]. https://www.kaggle.com/datasets/mathchi/diabetes-data-set
