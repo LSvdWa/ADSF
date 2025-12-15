@@ -156,13 +156,49 @@ summary(fit2)
 
 ```{r}
 # assumptions
+
 ```
 
-## **Exploring the model**
+(Intercept) -1.127e+00 Age 8.326e-03 Glucose 6.076e-03 BMI 1.044e-01 DiabetesPedigreeFunction 1.623e-01 moderation 9.596e-10
 
 ```{r}
-#| warning: false
+# turns model to matrix
+X <- model.matrix(fit2)
 
+# Compares the rank to the amount of columns in the predictor matrix
+# if True, the predictor matrix is full rank
+qr(X)$rank == ncol(X)
+
+## **Exploring the model**
+```
+
+```{r}
+# Binomial 1: Outcome is binary
+levels(factor(dataRDS$Outcome))
+
+# Binomial 2:Linear predictor can explain all the systematic trends in 𝜋
+# no resudiual clustering after accounting for X
+ICC::ICCbare(x = dataRDS$Outcome, y = resid(fit2, type = "deviance"))
+# No important variables omitted from X
+```
+
+We must also satisfy three computational requirements that were not necessary in linear regression.
+
+The sample size is large enough to support numerical estimation.
+
+The outcome classes are suﬃciently balanced.
+
+There is no perfect prediction.
+
+Exploring the model
+
+```{r}
+nullFit <- glm(Outcome ~ 1, family = binomial, data = dataRDS)
+## Test the fit of our example model:
+anova(nullFit, fit2, test = "Chisq")
+
+car::vif(fit2) # shows no big multicolinearity
+plot(fit2)
 ```
 
 ## **Conclusion**
