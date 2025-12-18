@@ -55,7 +55,9 @@ To preprocess the data we categorized the BMI into four categories, being underw
 ```{r}
 # Initialization
 setwd(".")
+library(dplyr)
 library(ggplot2)
+library(magrittr)
 ```
 
 ```{r}
@@ -167,9 +169,45 @@ BIC(fit4)
 
 ## **Assumptions**
 
-```{r}
-# assumptions
+The first assumption in a logistic regression is that the outcome should be binary and therefore follow a binomial distribution. This is easy to check: you just need to be sure that the outcome can only take one of two responses. In our case, the possible outcomes are:
 
+-   Diabetes (coded 1)
+
+-   Not diabetes (coded 0)
+
+```{r}
+# Mutating Outcome into factor
+dataRDS$Outcome <- as.factor(dataRDS$Outcome)
+
+dataRDS %>% 
+  ggplot(aes(x = Outcome, fill = Outcome)) +
+  geom_bar() +
+  labs(x = "Outcome",
+       y = "Count",
+       title = "Distribution of the outcome variable") +
+  theme_bw()
+# You can see that there are indeed only two outcomes for `Outcome`, so our outcome follows a binomial distribution.
+```
+
+If you are using logistic regression to make predictions/classifications then the accuracy will be affected by imbalance in the outcome classes. Notice that in the plot you just made there are more people who do not have diabetes than who do. A possible consequence is reduced accuracy in classification of diabetes.
+
+Sample size in logistic regression is a complex issue, but some suggest that it is ideal to have 10 cases per candidate predictor in your model. The minimum number of cases to include is N=10k/p, where k is the number of predictors and p is the smallest proportion of negative or positive cases in the population.
+
+```{r}
+#First we need to get the proportion of people that have diabetes in our sample, which is 0.33
+
+dataRDS %>% 
+  count(Outcome) %>% 
+  mutate(prop = n / sum(n))
+```
+
+```{r}
+#Now we can plug this into our formula to get the minimum number of positive cases. 
+ssize_cal <- function(k, p){
+  round((10*k)/p)
+}
+
+ssize_cal(2, 0.33)
 ```
 
 (Intercept) -1.127e+00
@@ -194,12 +232,21 @@ qr(X)$rank == ncol(X)
 ```
 
 ```{r}
+
+titanic %>% 
+  ggplot(aes(x = Survived, fill = Survived)) +
+  geom_bar() +
+  labs(x = "Survival",
+       y = "Count",
+       title = "Distribution of the outcome variable") +
+  theme_bw()
 # Binomial 1: Outcome is binary
-levels(factor(dataRDS$Outcome))
+
 
 # Binomial 2:Linear predictor can explain all the systematic trends in 𝜋
 # no resudiual clustering after accounting for X
 ICC::ICCbare(x = dataRDS$Outcome, y = resid(fit2, type = "deviance"))
+
 # No important variables omitted from X
 ```
 
