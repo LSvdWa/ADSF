@@ -229,7 +229,7 @@ fit2 <- glm(Outcome ~ Age + Glucose + BMI + DiabetesPedigreeFunction,
 plot(fit2, 4)
 ```
 
-Exploring the model
+**Exploring the model**
 
 ```{r}
 nullFit <- glm(Outcome ~ 1, family = binomial, data = dataRDS)
