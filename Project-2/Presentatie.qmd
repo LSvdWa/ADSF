@@ -1,0 +1,72 @@
+---
+title: "Predicting Diabetes"
+authors:
+- Demi van den Biggelaar (9660089)
+- "August Gesthuizen (5292565)"
+- "Friso Harff (7526946)"
+- "Leander van der Waal (7180063)"
+date: "2026-01-15"
+format:
+  html:
+    embed-resources: true
+---
+
+## Intro
+
+authors:
+- Demi van den Biggelaar (9660089)
+- August Gesthuizen (5292565)
+- Friso Harff (7526946)
+- Leander van der Waal (7180063)
+
+## Inhoudsopgave
+
+When you click the **Render** button a document will be generated that includes:
+
+-   Content authored with markdown
+-   Output from executable code
+
+## Inlezen data + research questions
+
+When you click the **Render** button a presentation will be generated that includes both content and the output of embedded code. You can embed code like this:
+
+```{r }
+1 + 1
+```
+
+## Beste model kiezen en uitleggen (leg uit wat het beste model is, wat het doet en waarom het het beste is)
+
+When you click the **Render** button a presentation will be generated that includes both content and the output of embedded code. You can embed code like this:
+
+```{r }
+1 + 1
+```
+
+## assumptions, welke assumptions, waarom ze voldoen 
+
+When you click the **Render** button a presentation will be generated that includes both content and the output of embedded code. You can embed code like this:
+
+```{r }
+1 + 1
+```
+
+## assumptions, delete outliers, laat zien dat ie niet van belang is op case by case basis
+When you click the **Render** button a presentation will be generated that includes both content and the output of embedded code. You can embed code like this:
+
+```{r }
+1 + 1
+```
+
+## Exploring the model section, ga in op het model met onderzoeksmethode uit slides INCLUDING CONFUSION MATRIX
+When you click the **Render** button a presentation will be generated that includes both content and the output of embedded code. You can embed code like this:
+
+```{r }
+1 + 1
+```
+
+## Concludeer en beantwoord
+When you click the **Render** button a presentation will be generated that includes both content and the output of embedded code. You can embed code like this:
+
+```{r }
+1 + 1
+```
