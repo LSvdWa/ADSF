@@ -137,10 +137,10 @@ Above you can see multiple ways that our variables are described. They are repre
 fit0 <- glm(Outcome ~ Age + Pregnancies + Glucose + BloodPressure + SkinThickness + Insulin + BMI + DiabetesPedigreeFunction + moderation,  
             data = dataRDS)
 
-fit1 <- glm(Outcome ~ Age + Glucose + BMI + DiabetesPedigreeFunction + moderation,  
+fit1 <- glm(Outcome ~ Age + Glucose + BMI + DiabetesPedigreeFunction,  
             data = dataRDS)
 
-fit2 <- glm(Outcome ~ Age + Glucose + BMI + DiabetesPedigreeFunction,  
+fit2 <- glm(Outcome ~ Age + Glucose + BMI + DiabetesPedigreeFunction + Glucose*BMI,  
             data = dataRDS)
 
 fit3 <- glm(Outcome ~ Glucose + BMI + DiabetesPedigreeFunction,  
@@ -156,7 +156,7 @@ BIC(fit1)
 #2 is best
 AIC(fit2)
 BIC(fit2)
-
+summary(fit2)
 
 AIC(fit3)
 BIC(fit3)
@@ -215,7 +215,17 @@ remove outlier:
 
 ```{r}
 plot(fit2, 4)
-dataRDS <- dataRDS[-229,]
+
+cooks <- cooks.distance(fit2)
+cutoff <- 10 / nrow(dataRDS)
+outliers <- which(cooks > cutoff)
+
+dataRDS[outliers,]
+
+dataRDS <- dataRDS[-outliers,]
+
+fit2 <- glm(Outcome ~ Age + Glucose + BMI + DiabetesPedigreeFunction,  
+            data = dataRDS)
 plot(fit2, 4)
 ```
 
@@ -237,7 +247,7 @@ dfbetas(fit2)[ , "Glucose"] |> plot()
 # read performance
 library(dplyr)
 ## Add predictions to the dataset:
-dataRDS %<>%
+dataRDS <- dataRDS %>%
   mutate(
     piHat = predict(fit2, type = "response"),  # predicted probabilities
     yHat  = factor(ifelse(piHat > 0.5, 1, 0), levels = c(0, 1))
@@ -256,7 +266,7 @@ cMat$table
 cMat$byClass
 
 # ROC Curve
-rocData <- dataRDS %$%
+rocData <- dataRDS %>%
 pROC::roc(Outcome, piHat)
 plot(rocData)
 
