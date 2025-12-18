@@ -78,14 +78,6 @@ dataRDS$BMI[dataRDS$BMI > 18.5 & dataRDS$BMI <= 25  ] <- 2 # Healthy
 dataRDS$BMI[dataRDS$BMI > 25 & dataRDS$BMI <= 30 ] <- 3    # Overweight
 dataRDS$BMI[dataRDS$BMI > 30] <- 4                         # Obese
 
-# maybe use this to make it into factors instead of integers.
-dataRDS$BMI_cat_num <- cut(
-  dataRDS$BMI,
-  breaks = c(-Inf, 18.5, 25, 30, Inf),
-  labels = c(1, 2, 3, 4),
-  right = TRUE
-)
-
 # Removing missing values
 dataRDS <- subset(dataRDS,
                      BloodPressure != 0 &
@@ -142,13 +134,34 @@ Above you can see multiple ways that our variables are described. They are repre
 ## **Building the model**
 
 ```{r}
-fit1 <- glm(Outcome ~ Age + Pregnancies + Glucose + BloodPressure + SkinThickness + Insulin + BMI + DiabetesPedigreeFunction + moderation,  
+fit0 <- glm(Outcome ~ Age + Pregnancies + Glucose + BloodPressure + SkinThickness + Insulin + BMI + DiabetesPedigreeFunction + moderation,  
             data = dataRDS)
-summary(fit1)
 
-fit2 <- glm(Outcome ~ Age + Glucose + BMI + DiabetesPedigreeFunction + moderation,  
+fit1 <- glm(Outcome ~ Age + Glucose + BMI + DiabetesPedigreeFunction + moderation,  
             data = dataRDS)
-summary(fit2)
+
+fit2 <- glm(Outcome ~ Age + Glucose + BMI + DiabetesPedigreeFunction,  
+            data = dataRDS)
+
+fit3 <- glm(Outcome ~ Glucose + BMI + DiabetesPedigreeFunction,  
+            data = dataRDS)
+
+fit4 <- glm(Outcome ~ Glucose + BMI,  
+            data = dataRDS)
+AIC(fit0)
+BIC(fit0)
+AIC(fit1)
+BIC(fit1)
+
+#2 is best
+AIC(fit2)
+BIC(fit2)
+
+
+AIC(fit3)
+BIC(fit3)
+AIC(fit4)
+BIC(fit4)
 
 ```
 
@@ -159,7 +172,15 @@ summary(fit2)
 
 ```
 
-(Intercept) -1.127e+00 Age 8.326e-03 Glucose 6.076e-03 BMI 1.044e-01 DiabetesPedigreeFunction 1.623e-01 moderation 9.596e-10
+(Intercept) -1.127e+00
+
+Age 8.326e-03
+
+Glucose 6.076e-03 BMI 1.044e-01
+
+DiabetesPedigreeFunction 1.623e-01
+
+moderation 9.596e-10
 
 ```{r}
 # turns model to matrix
@@ -190,6 +211,14 @@ The outcome classes are suﬃciently balanced.
 
 There is no perfect prediction.
 
+remove outlier:
+
+```{r}
+plot(fit2, 4)
+dataRDS <- dataRDS[-229,]
+plot(fit2, 4)
+```
+
 Exploring the model
 
 ```{r}
@@ -199,6 +228,39 @@ anova(nullFit, fit2, test = "Chisq")
 
 car::vif(fit2) # shows no big multicolinearity
 plot(fit2)
+plot(fit2, 4)
+
+
+car::crPlots(fit2, "Glucose")
+dfbetas(fit2)[ , "Glucose"] |> plot()
+
+# read performance
+library(dplyr)
+## Add predictions to the dataset:
+dataRDS %<>%
+  mutate(
+    piHat = predict(fit2, type = "response"),  # predicted probabilities
+    yHat  = factor(ifelse(piHat > 0.5, 1, 0), levels = c(0, 1))
+  )
+
+# Make levels the same
+dataRDS$y <- factor(dataRDS$y, levels = c(0, 1))
+
+library(caret)
+cMat <- confusionMatrix(
+  data = dataRDS$yHat,
+  reference = dataRDS$y
+)
+
+cMat$table
+cMat$byClass
+
+# ROC Curve
+rocData <- dataRDS %$%
+pROC::roc(Outcome, piHat)
+plot(rocData)
+
+#CEE for comparison good models
 ```
 
 ## **Conclusion**
