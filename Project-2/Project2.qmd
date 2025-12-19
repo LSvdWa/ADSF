@@ -1,7 +1,7 @@
 ---
 title: "Predicting Diabetes"
 authors:
-- Demi van den Biggelaar (9660089)
+- "Demi van den Biggelaar (9660089)"
 - "August Gesthuizen (5292565)"
 - "Friso Harff (7526946)"
 - "Leander van der Waal (7180063)"
@@ -46,6 +46,8 @@ The different parameters in the dataset are:
 
 -   Outcome: Class variable (0 or 1, where 1 means positive for diabetes)
 
+Our research question is as follows: can we predict whether someone has diabetes based on the parameters #############FILL IN#################################### using logistic regression?
+
 ## **Preprocessing & Loading data**
 
 To preprocess the data we categorized the BMI into four categories, being underweight, healthy, overweight and obese. We also remove entries where we see that values are clearly skewed, for example a BMI of 0 should not exist.
@@ -58,6 +60,10 @@ setwd(".")
 library(dplyr)
 library(ggplot2)
 library(magrittr)
+library(kableExtra)
+library(pROC)
+library(regclass)
+library(caret)
 ```
 
 ```{r}
@@ -137,37 +143,43 @@ Above you can see multiple ways that our variables are described. They are repre
 
 ```{r}
 fit0 <- glm(Outcome ~ Age + Pregnancies + Glucose + BloodPressure + SkinThickness + Insulin + BMI + DiabetesPedigreeFunction + moderation,  
+            family = binomial,
             data = dataRDS)
 
 fit1 <- glm(Outcome ~ Age + Glucose + BMI + DiabetesPedigreeFunction,  
+            family = binomial,
             data = dataRDS)
 
-fit2 <- glm(Outcome ~ Age + Glucose + BMI + DiabetesPedigreeFunction + Glucose*BMI,  
+fit2 <- glm(Outcome ~ Age + Glucose + BMI + DiabetesPedigreeFunction + Glucose*BMI,
+            family = binomial,
             data = dataRDS)
 
-fit3 <- glm(Outcome ~ Glucose + BMI + DiabetesPedigreeFunction,  
+fit3 <- glm(Outcome ~ Glucose + BMI + DiabetesPedigreeFunction, 
+            family = binomial,
             data = dataRDS)
 
-fit4 <- glm(Outcome ~ Glucose + BMI,  
+fit4 <- glm(Outcome ~ Glucose + BMI,
+            family = binomial,
             data = dataRDS)
 AIC(fit0)
 BIC(fit0)
+
+# fit1 is best
 AIC(fit1)
 BIC(fit1)
+summary(fit1)
 
-#2 is best
 AIC(fit2)
 BIC(fit2)
-summary(fit2)
-
 AIC(fit3)
 BIC(fit3)
 AIC(fit4)
 BIC(fit4)
-
 ```
 
 ## **Assumptions**
+
+### Binary dependent variable
 
 The first assumption in a logistic regression is that the outcome should be binary and therefore follow a binomial distribution. This is easy to check: you just need to be sure that the outcome can only take one of two responses. In our case, the possible outcomes are:
 
@@ -176,7 +188,7 @@ The first assumption in a logistic regression is that the outcome should be bina
 -   Not diabetes (coded 0)
 
 ```{r}
-# Mutating Outcome into factor
+# Mutating Outcome into factor (necessary for next part)
 dataRDS$Outcome <- as.factor(dataRDS$Outcome)
 
 dataRDS %>% 
@@ -184,14 +196,20 @@ dataRDS %>%
   geom_bar() +
   labs(x = "Outcome",
        y = "Count",
-       title = "Distribution of the outcome variable") +
+       title = "Distribution of the Outcome variable") +
   theme_bw()
 # You can see that there are indeed only two outcomes for `Outcome`, so our outcome follows a binomial distribution.
 ```
 
-If you are using logistic regression to make predictions/classifications then the accuracy will be affected by imbalance in the outcome classes. Notice that in the plot you just made there are more people who do not have diabetes than who do. A possible consequence is reduced accuracy in classification of diabetes.
+### Balanced outcomes
 
-Sample size in logistic regression is a complex issue, but some suggest that it is ideal to have 10 cases per candidate predictor in your model. The minimum number of cases to include is N=10k/p, where k is the number of predictors and p is the smallest proportion of negative or positive cases in the population.
+When using logistic regression to make predictions, then the accuracy will be affected by imbalance in the outcome classes. Notice that in the plot we just made there are more people who do not have diabetes than who do. A possible consequence is reduced accuracy in classification of diabetes.
+
+A certain amount of imbalance is expected and can be handled well by the model in most cases. The effects of this imbalance is context-dependable. Some solutions to serious class imbalance are down-sampling or weighting the outcomes to balance the importance placed on the outcomes by the model. In this case, we consider the imbalance to be not extreme enough to not be handled sufficiently by the model.
+
+### Sufficiently large sample size
+
+Sample size in logistic regression is a complex issue, but some suggest that it is ideal to have 10 cases per candidate predictor in your model. The minimum number of cases to include is $N=\frac{10k}{p}$, where $k$ is the number of predictors and $p$ is the smallest proportion of negative or positive cases in the population.
 
 ```{r}
 #First we need to get the proportion of people that have diabetes in our sample, which is 0.33
@@ -210,53 +228,59 @@ ssize_cal <- function(k, p){
 ssize_cal(2, 0.33)
 ```
 
-(Intercept) -1.127e+00
+As can be seen in the Distribution of the Outcome variable chart, we have clearly more than the required 61 positive cases. To be exact we have 130 positive cases for diabetes. This means that our sample size is large enough.
 
-Age 8.326e-03
+### Predictor matrix is full-rank
 
-Glucose 6.076e-03 BMI 1.044e-01
-
-DiabetesPedigreeFunction 1.623e-01
-
-moderation 9.596e-10
+For logistic regression it is important that there need to be more observations than predictors and there should be no multicollinearity among the linear predictors.
 
 ```{r}
-# turns model to matrix
-X <- model.matrix(fit2)
-
-# Compares the rank to the amount of columns in the predictor matrix
-# if True, the predictor matrix is full rank
-qr(X)$rank == ncol(X)
-
-## **Exploring the model**
+VIF(fit1)
 ```
 
-```{r}
+### Continuous predictors are linearly related to the $logit(\pi)$ 
 
-titanic %>% 
-  ggplot(aes(x = Survived, fill = Survived)) +
-  geom_bar() +
-  labs(x = "Survival",
-       y = "Count",
-       title = "Distribution of the outcome variable") +
+Logistic regression models assume linear relationship between predictor variables and the logit of the outcome variable. This assumption is mainly concerned with continuous predictors. Since we only have one continuous predictor we can plot the relationship between age and the logit of survived.
+
+Our continuous predictors are `Age`, `Glucose` and `DiabetesPedigreeFunction`. We plot the relationships of these predictors and the logit of `Outcome`.
+
+```{r}
+# making the logit
+dataRDS$logit <- predict(fit2, type="link")
+
+# plotting the relations
+dataRDS %>%
+  ggplot(aes(Age, logit))+
+  geom_point(size = 0.5, alpha = 0.5) +
+  geom_smooth(method = "glm") +
   theme_bw()
-# Binomial 1: Outcome is binary
 
+dataRDS %>%
+  ggplot(aes(Glucose, logit))+
+  geom_point(size = 0.5, alpha = 0.5) +
+  geom_smooth(method = "glm") +
+  theme_bw()
 
-# Binomial 2:Linear predictor can explain all the systematic trends in 𝜋
-# no resudiual clustering after accounting for X
-ICC::ICCbare(x = dataRDS$Outcome, y = resid(fit2, type = "deviance"))
-
-# No important variables omitted from X
+dataRDS %>%
+  ggplot(aes(DiabetesPedigreeFunction, logit))+
+  geom_point(size = 0.5, alpha = 0.5) +
+  geom_smooth(method = "glm") +
+  theme_bw()
 ```
 
-We must also satisfy three computational requirements that were not necessary in linear regression.
+Age, Glucose and DiabetesPedigreeFunction all appear to not be linearly related to the predicted logit values. To try and fix this, we have to apply transformations to the variables.
 
-The sample size is large enough to support numerical estimation.
+```{r}
+# transformations
+dataRDS$AgeTransformed <- dataRDS$Age^0.1
 
-The outcome classes are suﬃciently balanced.
-
-There is no perfect prediction.
+# plotting the relations
+dataRDS %>%
+  ggplot(aes(AgeTransformed1, logit))+
+  geom_point(size = 0.5, alpha = 0.5) +
+  geom_smooth(method = "glm") +
+  theme_bw()
+```
 
 remove outlier:
 
