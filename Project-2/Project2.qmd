@@ -177,6 +177,8 @@ AIC(fit4)
 BIC(fit4)
 ```
 
+EXPLAIN WHY 1 IS BETTER THAN ALL OTHERS
+
 ## **Assumptions**
 
 ### Binary dependent variable
@@ -238,7 +240,9 @@ For logistic regression it is important that there need to be more observations 
 VIF(fit1)
 ```
 
-### Continuous predictors are linearly related to the $logit(\pi)$ 
+EXPLAIN WHY WHEN IT WORKS AS INTENDED, NEED ANSWERS FROM TEACHER TO GET IT TO WORK
+
+### Continuous predictors are linearly related to the $logit(\pi)$
 
 Logistic regression models assume linear relationship between predictor variables and the logit of the outcome variable. This assumption is mainly concerned with continuous predictors. Since we only have one continuous predictor we can plot the relationship between age and the logit of survived.
 

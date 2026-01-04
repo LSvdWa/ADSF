@@ -11,7 +11,6 @@ format:
     embed-resources: true
 ---
 
-
 ## Inhoudsopgave - Leander
 
 When you click the **Render** button a document will be generated that includes:
@@ -37,10 +36,54 @@ When you click the **Render** button a presentation will be generated that inclu
 
 ## assumptions, welke assumptions, waarom ze voldoen - Friso
 
-When you click the **Render** button a presentation will be generated that includes both content and the output of embedded code. You can embed code like this:
+## Binary dependent variable
+
+-   Diabetes (coded 1)
+-   Not diabetes (coded 0)
 
 ```{r }
-1 + 1
+# Mutating Outcome into factor (necessary for next part)
+dataRDS$Outcome <- as.factor(dataRDS$Outcome)
+
+dataRDS %>% 
+  ggplot(aes(x = Outcome, fill = Outcome)) +
+  geom_bar() +
+  labs(x = "Outcome",
+       y = "Count",
+       title = "Distribution of the Outcome variable") +
+  theme_bw()
+# You can see that there are indeed only two outcomes for `Outcome`, so our outcome follows a binomial distribution.
+```
+
+## Sufficiently large sample size
+
+-   10 cases per candidate predictor : $N=\frac{10k}{p}$
+
+```{r}
+#First we need to get the proportion of people that have diabetes in our sample, which is 0.33
+
+dataRDS %>% 
+  count(Outcome) %>% 
+  mutate(prop = n / sum(n))
+```
+
+```{r}
+#Now we can plug this into our formula to get the minimum number of positive cases. 
+ssize_cal <- function(k, p){
+  round((10*k)/p)
+}
+
+ssize_cal(2, 0.33)
+```
+
+## Full-rank predictor matrix
+
+-   More observations than predictors
+
+-   No multicollinearity among linear predictors
+
+```{r}
+VIF(fit1)
 ```
 
 ## assumptions, delete outliers, laat zien dat ie niet van belang is op case by case basis - Friso
