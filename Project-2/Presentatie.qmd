@@ -7,8 +7,11 @@ authors:
 - "Leander van der Waal (7180063)"
 date: "2026-01-15"
 format:
-  html:
+  revealjs:
     embed-resources: true
+    theme: simple
+    slide-number: true
+    transition: fade
 ---
 
 ```{r}
@@ -64,6 +67,10 @@ National Institute of Diabetes and Digestive and Kidney Diseases (1990)
 ## Inlezen data Leander
 
 ```{r}
+#| echo: true
+#| output: false
+#| code-line-numbers: true
+#| code-fold: false
 datacsv <- read.csv("./data/raw/diabetes.csv", header = TRUE)
 saveRDS(datacsv, "./data/raw/dataset.rds")
 
