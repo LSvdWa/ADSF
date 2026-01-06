@@ -1,4 +1,16 @@
-------------------------------------------------------------------------
+---
+title: "Predicting Diabetes"
+authors:
+- "Demi van den Biggelaar (9660089)"
+- "August Gesthuizen (5292565)"
+- "Friso Harff (7526946)"
+- "Leander van der Waal (7180063)"
+date: "2026-01-15"
+format:
+  html:
+    embed-resources: true
+---
+
 
 # **Prediction of glucose using linear regression**
 
@@ -33,14 +45,11 @@ The different parameters in the dataset are:
 
 -   Outcome: Class variable (0 or 1, where 1 means positive for diabetes)
 
+Our research question is as follows: can we predict whether someone has diabetes based on the parameters given in the dataset, namely: Pregnancies, Glucose, BloodPressure, SkinThickness, Insulin, BMI, DiabetesPedigreeFunction, Age and outcome or a subset of these paramaters using logistic regression?
+
 ## **Preprocessing & Loading data**
 
 To preprocess the data we categorized the BMI into four categories, being underweight, healthy, overweight and obese. We have kept all the data, because there were not many missing values or flukes in the data.
-
-```{r}
-#| warning: false
-install.packages('car')
-```
 
 ------------------------------------------------------------------------
 
@@ -80,10 +89,6 @@ dataRDS <- subset(dataRDS,
                      BMI != 0 &
                      SkinThickness != 0)
 
-# Adding moderation
-dataRDS$moderation <- dataRDS$BMI * dataRDS$Insulin * dataRDS$SkinThickness * (dataRDS$BloodPressure) 
-
-summary(dataset)
 ```
 
 ## **Exploring the data**
@@ -91,17 +96,18 @@ summary(dataset)
 ```{r}
 #| warning: false
 
-dataRDS
 for (i in 1:ncol(dataRDS)) {
   col_name <- colnames(dataRDS)[i]
-  print(hist(dataRDS[, i],
+  hist(dataRDS[, i],
        main = paste("Histogram of ", col_name),
        xlab = paste("Values of", col_name),
        col = "lightblue",
-       border = "white"))
+       border = "white")
 }
 pairs(dataRDS)
 ```
+
+\########## DESCRIBE WHY EACH HISTOGRAM IS MEANINGFUL AND WHERE IN THE PAIRS YOU CAN SEE INTERESTING INTERACTIONS##############
 
 Above you can see multiple ways that our variables are described. They are represented in two ways: using histograms and using.a panel. In the histograms you can see which values are representative of each variable while in the panel you can see the relation between of each variable with each other variable. The histograms will be briefly discussed, however remaining discussion will focus only on the relevant plots from the panel which we use for regression.
 
@@ -123,20 +129,21 @@ Above you can see multiple ways that our variables are described. They are repre
 
 -   **Outcome:** 0 or 1 value representing if someone has diabetes or not. Most participants don’t have diabetes.
 
--   **Moderation:** Product of the following values: BMI, Insulin, SkinThickness and BloodPressure. This value is added to support the regression accuracy.
 
 ## **Building the model**
 
 ```{r}
 #| warning: false
+
+########################## AAAAAAADDDDDDDDDDDDDDDDDD MODERATION #####################
 # model with all columns as predictors
-model <- lm(Glucose ~ Age + Insulin + BMI + Pregnancies + BloodPressure + SkinThickness + DiabetesPedigreeFunction + moderation, 
+model <- lm(Glucose ~ Age + Insulin + BMI + Pregnancies + BloodPressure + SkinThickness + DiabetesPedigreeFunction, 
              data = dataRDS)
 # model with all predictor p < 0.05 
-model2 <- lm(Glucose ~ Age + Insulin + BMI + SkinThickness + moderation + DiabetesPedigreeFunction, 
+model2 <- lm(Glucose ~ Age + Insulin + BMI + SkinThickness + DiabetesPedigreeFunction, 
              data = dataRDS)
 # model with all predictors p < 0.01 and moderation
-model3 <- lm(Glucose ~ Age + Insulin + BMI + SkinThickness + moderation, 
+model3 <- lm(Glucose ~ Age + Insulin + BMI + SkinThickness , 
              data = dataRDS)
 
 # Ask for summary statistics again
@@ -172,15 +179,12 @@ ggplot(dataRDS, aes(x = BMI, y = Glucose)) +
   geom_smooth(method = "lm", se = FALSE) +
   labs(title = "Linear Relationship between BMI and Glucose")
 
-# Plot with regression line for x2
-ggplot(dataRDS, aes(x = moderation, y = Glucose)) +
-  geom_point() +
-  geom_smooth(method = "lm", se = FALSE) +
-  labs(title = "Linear Relationship between Moderation and Glucose")
 
 
 
 ```
+
+#################DISCUSSIE OVER MODEL BOUWEN EN ONDERBOUWEN WAAROM HET GOED IS, DIT GECOMBINEERD MET EEN BETEKENISVOLLE MODERATION TOEVOEGEN##########
 
 ## **Boxplots for each predictor**
 
@@ -209,10 +213,6 @@ ggplot(dataRDS, aes(x = factor(BMI), y = Glucose)) +
   geom_boxplot() +
   labs(title = "Glucose Distribution by BMI")
 
-# Boxplot for Moderation vs Glucose, moet maar over geargumenteerd worden
-ggplot(dataRDS, aes(x = factor(moderation), y = Glucose)) +
-  geom_boxplot() +
-  labs(title = "Glucose Distribution by Moderation")
 
 errors <- dataRDS$Glucose - predict(model3)
 squared <- errors^2
@@ -226,14 +226,23 @@ To be able to use a multiple linear regression model to predict, we need to veri
 
 1.  Model is linear in the parameters: This holds for our values are static and non exponential as seen here:
 
-```         
-Intercept.     7.408e+01  
-Age            6.592e-01  
-Insulin        6.762e-02  
-BMI            6.838e+00  
-SkinThickness -3.211e-01  
-moderation     3.965e-06
+```{r}
+fitted_vals <- fitted(model3)
+residuals_dev <- residuals(model3, type = "deviance")
+
+# Plot
+plot(
+  fitted_vals,
+  residuals_dev,
+  xlab = "Fitted values",
+  ylab = "Deviance residuals",
+  main = "Residuals vs Fitted"
+)
+abline(h = 0, lty = 2)
 ```
+
+###########ABOVE IS HOW WHE SHOULD SHOW LINEARITY, BESCHRIJF WAAROM DIT LINEARITY LAAT ZIEN###############\
+\############### voorbeeld van t internet Because the residuals are symmetrically distributed around zero and do not exibit non-random trends or changes in direction across the range of fitted values there is no evidence of a non linear relationship between the predictors and the log-odds of the outcome therefore the residuals-versus-fitted plot provides support that the linearity assumption is reasonably satisfied \####
 
 2.  Predictor model is full rank:
 
@@ -293,7 +302,11 @@ densityPlot(errors,
        xlab = paste("error values"))
 ```
 
+\############ CHECK OUTLIERS AND INFLUENTIAL CASES \########################
+
 The other four assumptions of the linear regression model that were checked are linearity, homoscedasticity, normal distribution, and correlated errors. The Q-Q plot and density plot analysis suggested a potential risk for violation of the normality assumption of residuals. The can be seen in the Q-Q plot by the upper tail deviating from the dotted line and in the density plot by a slight skewing on the right of the distribution. A Shapiro-Wilk test was performed on the residuals which resulted in the test statistic W = 0.97, *p \< .05*. Normality assumption of residuals was thus not rejected. Homoscedasticity was assessed by plotting the residuals. Visual inspection of the residuals suggested heteroscedasticity with an increase in spread of the residuals at higher predicted values. The Durbin-Watson test was run to look for autocorrelation of the errors and showed a test statistic of DW ≈ 2, indicating no autocorrelation in the residuals. Finally, for the correlation of errors, we ran individual visual analyses for every predicting variable. Age, insulin, and skin thickness all suggest no correlation. BMI, however, visibly increased together with the errors. This could be explained by BMI not being a continuous variable, the grouping of the variable resulting in an uneven distribution of data points, and thus showing a correlation with the errors.
+
+\########## EXPAND on the effect of violating an assumption \############
 
 ## **Exploring the model**
 

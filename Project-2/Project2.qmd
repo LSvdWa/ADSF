@@ -46,7 +46,7 @@ The different parameters in the dataset are:
 
 -   Outcome: Class variable (0 or 1, where 1 means positive for diabetes)
 
-Our research question is as follows: can we predict whether someone has diabetes based on the parameters #############FILL IN#################################### using logistic regression?
+Our research question is as follows: can we predict whether someone has diabetes based on the parameters given in the dataset, namely: Pregnancies, Glucose, BloodPressure, SkinThickness, Insulin, BMI, DiabetesPedigreeFunction, Age and outcome or a subset of these paramaters using logistic regression?
 
 ## **Preprocessing & Loading data**
 
@@ -94,9 +94,6 @@ dataRDS <- subset(dataRDS,
                      Insulin != 0 &
                      BMI != 0)
 
-# Adding moderation
-dataRDS$moderation <- dataRDS$BMI * dataRDS$Insulin * dataRDS$SkinThickness * dataRDS$BloodPressure 
-
 summary(dataset)
 ```
 
@@ -108,11 +105,11 @@ summary(dataset)
 dataRDS
 for (i in 1:ncol(dataRDS)) {
   col_name <- colnames(dataRDS)[i]
-  print(hist(dataRDS[, i],
+  hist(dataRDS[, i],
        main = paste("Histogram of ", col_name),
        xlab = paste("Values of", col_name),
        col = "lightblue",
-       border = "white"))
+       border = "white")
 }
 pairs(dataRDS)
 ```
@@ -142,7 +139,7 @@ Above you can see multiple ways that our variables are described. They are repre
 ## **Building the model**
 
 ```{r}
-fit0 <- glm(Outcome ~ Age + Pregnancies + Glucose + BloodPressure + SkinThickness + Insulin + BMI + DiabetesPedigreeFunction + moderation,  
+fit0 <- glm(Outcome ~ Age + Pregnancies + Glucose + BloodPressure + SkinThickness + Insulin + BMI + DiabetesPedigreeFunction,  
             family = binomial,
             data = dataRDS)
 
