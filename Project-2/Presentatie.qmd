@@ -5,11 +5,11 @@ authors:
 - "August Gesthuizen (5292565)"
 - "Friso Harff (7526946)"
 - "Leander van der Waal (7180063)"
-date: "2026-01-15"
+date: "15-01-2026"
 format:
   revealjs:
     embed-resources: true
-    theme: simple
+    theme: dracula
     slide-number: true
     transition: fade
 ---
@@ -41,7 +41,7 @@ library(GGally)
 
 ## Research Questions - Leander
 
-Can we predict if someone is diabetic using the previously stated variables with a logistic regression?
+Can we predict if someone is diabetic using research data with a logistic regression?
 
 ## De Dataset
 
