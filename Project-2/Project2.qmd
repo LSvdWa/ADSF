@@ -223,11 +223,11 @@ dataRDS %>%
 ssize_cal <- function(k, p){
   round((10*k)/p)
 }
-
-ssize_cal(2, 0.33)
+# using k=4 as we have 4 predictors and p=0.33 as that is the proportion of diabetes=1.
+ssize_cal(4, 0.33)
 ```
 
-As can be seen in the Distribution of the Outcome variable chart, we have clearly more than the required 61 positive cases. To be exact we have 130 positive cases for diabetes. This means that our sample size is large enough.
+As can be seen in the Distribution of the Outcome variable chart, we have clearly more than the required 121 positive cases. We have 130 positive cases for diabetes. This means that our sample size is large enough.
 
 ### Predictor matrix is full-rank
 
@@ -237,13 +237,11 @@ For logistic regression it is important that there need to be more observations 
 VIF(fit1)
 ```
 
-EXPLAIN WHY WHEN IT WORKS AS INTENDED, NEED ANSWERS FROM TEACHER TO GET IT TO WORK
+All VIF scores are close to 1, meaning that they are not correlated. Therefore, this assumption is not violated.
 
 ### Continuous predictors are linearly related to the $logit(\pi)$
 
-Logistic regression models assume linear relationship between predictor variables and the logit of the outcome variable. This assumption is mainly concerned with continuous predictors. Since we only have one continuous predictor we can plot the relationship between age and the logit of survived.
-
-Our continuous predictors are `Age`, `Glucose` and `DiabetesPedigreeFunction`. We plot the relationships of these predictors and the logit of `Outcome`.
+Logistic regression models assume linear relationship between predictor variables and the logit of the outcome variable. This assumption is mainly concerned with continuous predictors. Our continuous predictors are `Age`, `Glucose` and `DiabetesPedigreeFunction`. We plot the relationships of these predictors and the logit of `Outcome`.
 
 ```{r}
 # making the logit
@@ -269,36 +267,34 @@ dataRDS %>%
   theme_bw()
 ```
 
-Age, Glucose and DiabetesPedigreeFunction all appear to not be linearly related to the predicted logit values. To try and fix this, we have to apply transformations to the variables.
+In the plots above it is clear that the blue line follows the pattern in the data nicely. A critic might argue that, for example in the relation between age and the logit, the pattern dips a little around age=50 to age=60, but there is no clear curved relation present. Therefore, this is not really a problem and the assumption is not violated.
+
+### No influential values or outliers
+
+Influential values are extreme individual data points that can affect the fit for the logistic regression model. They can be visualised using Cook's distance and the Residuals vs Leverage plot.
+
+The Cook's distance plot shows the top 3 largest values. Not all outliers are influential cases, so the Residuals vs Leverage plot should be inspected as well, which shows actual influential cases. Leverage is the extend that the model coefficients will change if a particular observation is removed from the dataset.
 
 ```{r}
-# transformations
-dataRDS$AgeTransformed <- dataRDS$Age^0.1
-
-# plotting the relations
-dataRDS %>%
-  ggplot(aes(AgeTransformed1, logit))+
-  geom_point(size = 0.5, alpha = 0.5) +
-  geom_smooth(method = "glm") +
-  theme_bw()
+plot(fit1, c(4,5))
 ```
 
-remove outlier:
+Points that fall outside of the dashed line (Cook's distance) are influential. There are no values which fall outside of the dashed lines, therefore there are no influential observations that need to be handled or discussed. Therefore this assumption is not violated.
+
+### Deviance Residuals
+
+Unlike linear regression, logistic regression does not need constant, finite error variance and normally distributed errors. For logistic regression deviance residuals are useful for determining if the individual points are not fit well by the model.
 
 ```{r}
-plot(fit2, 4)
-
-cooks <- cooks.distance(fit2)
-cutoff <- 10 / nrow(dataRDS)
-outliers <- which(cooks > cutoff)
-
-dataRDS[outliers,]
-
-dataRDS <- dataRDS[-outliers,]
-
-fit2 <- glm(Outcome ~ Age + Glucose + BMI + DiabetesPedigreeFunction,  
-            data = dataRDS)
-plot(fit2, 4)
+dr <- resid(fit1, type = "deviance")
+eta <- predict(fit1, type = "link")
+dr_data <- data.frame(residuals = dr,
+                      eta = rep(eta, 3))
+ggplot(dr_data, aes(x = eta, y = residuals)) +
+  geom_point(alpha = 0.35) +
+  geom_smooth(se = FALSE) +
+  labs(title = "Deviance Residuals") +
+  theme_bw()
 ```
 
 **Exploring the model**

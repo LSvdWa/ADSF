@@ -115,7 +115,8 @@ for (i in 1:1) {
 }
 ```
 
-##
+## 
+
 ```{r}
 for (i in 2:2) {
   col_name <- colnames(dataRDS)[i]
@@ -126,7 +127,9 @@ for (i in 2:2) {
        border = "white")
 }
 ```
-##
+
+## 
+
 ```{r}
 for (i in 3:3) {
   col_name <- colnames(dataRDS)[i]
@@ -137,9 +140,11 @@ for (i in 3:3) {
        border = "white")
 }
 ```
-minimum of 90/50 mmHg,  maximum of 180/100 mmHg 
 
-##
+minimum of 90/50 mmHg, maximum of 180/100 mmHg
+
+## 
+
 ```{r}
 for (i in 4:4) {
   col_name <- colnames(dataRDS)[i]
@@ -150,7 +155,9 @@ for (i in 4:4) {
        border = "white")
 }
 ```
-##
+
+## 
+
 ```{r}
 for (i in 5:5) {
   col_name <- colnames(dataRDS)[i]
@@ -161,7 +168,9 @@ for (i in 5:5) {
        border = "white")
 }
 ```
-##
+
+## 
+
 ```{r}
 for (i in 6:6) {
   col_name <- colnames(dataRDS)[i]
@@ -172,9 +181,11 @@ for (i in 6:6) {
        border = "white")
 }
 ```
+
 259/393 = 66% are obese
 
-##
+## 
+
 ```{r}
 #| warning: false
 for (i in 7:7) {
@@ -187,7 +198,9 @@ for (i in 7:7) {
 }
 
 ```
-##
+
+## 
+
 ```{r}
 for (i in 8:8) {
   col_name <- colnames(dataRDS)[i]
@@ -199,7 +212,9 @@ for (i in 8:8) {
 }
 
 ```
-##
+
+## 
+
 ```{r}
 #| warning: false
 for (i in 9:9) {
@@ -211,7 +226,9 @@ for (i in 9:9) {
        border = "white")
 }
 ```
-##
+
+## 
+
 ```{r}
 #| warning: false
 ggpairs(dataRDS)
@@ -245,8 +262,6 @@ fit4 <- glm(Outcome ~ Glucose + BMI,
             data = dataRDS)
 ```
 
-## assumptions, welke assumptions, waarom ze voldoen - Friso
-
 ## Binary dependent variable
 
 -   Diabetes (coded 1)
@@ -278,14 +293,9 @@ dataRDS %>%
   mutate(prop = n / sum(n))
 ```
 
-```{r}
-#Now we can plug this into our formula to get the minimum number of positive cases. 
-ssize_cal <- function(k, p){
-  round((10*k)/p)
-}
+-   k=4, p=0.33 -\> 121 required
 
-ssize_cal(2, 0.33)
-```
+-   130 positive
 
 ## Full-rank predictor matrix
 
@@ -297,7 +307,69 @@ ssize_cal(2, 0.33)
 VIF(fit1)
 ```
 
-## assumptions, delete outliers, laat zien dat ie niet van belang is op case by case basis - Friso
+-   VIF=1 : no correlation
+
+## Continuous predictors are linearly related to the $logit(\pi)$
+
+-   Continuous predictors : `Age`, `Glucose` and `DiabetesPedigreeFunction`
+
+-   For age:
+
+```{r}
+dataRDS$logit <- predict(fit2, type="link")  
+
+dataRDS %>%   
+  ggplot(aes(Age, logit)) +
+  geom_point(size = 0.5, alpha = 0.5) +
+  geom_smooth(method = "glm") +
+  theme_bw()
+```
+
+## Continuous predictors are linearly related to the $logit(\pi)$
+
+-   Continuous predictors : `Age`, `Glucose` and `DiabetesPedigreeFunction`
+
+-   For glucose:
+
+```{r}
+dataRDS$logit <- predict(fit2, type="link")  
+
+dataRDS %>%   
+  ggplot(aes(Glucose, logit)) +
+  geom_point(size = 0.5, alpha = 0.5) +
+  geom_smooth(method = "glm") +
+  theme_bw()
+```
+
+## Continuous predictors are linearly related to the $logit(\pi)$
+
+-   Continuous predictors : `Age`, `Glucose` and `DiabetesPedigreeFunction`
+
+-   For bmipedigreefunction:
+
+```{r}
+dataRDS$logit <- predict(fit2, type="link")  
+
+dataRDS %>%   
+  ggplot(aes(DiabetesPedigreeFunction, logit)) +
+  geom_point(size = 0.5, alpha = 0.5) +
+  geom_smooth(method = "glm") +
+  theme_bw()
+```
+
+## No influential values or outliers
+
+```{r}
+plot(fit1, 5)
+```
+
+-   No values outside Cook's distance
+
+-   No influential observations
+
+### 
+
+## Deviance Residuals?
 
 When you click the **Render** button a presentation will be generated that includes both content and the output of embedded code. You can embed code like this:
 
