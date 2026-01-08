@@ -5,7 +5,7 @@ authors:
 - "August Gesthuizen (5292565)"
 - "Friso Harff (7526946)"
 - "Leander van der Waal (7180063)"
-date: "15-01-2026"
+date: "2026-01-15"
 format:
   revealjs:
     embed-resources: true
@@ -311,9 +311,7 @@ VIF(fit1)
 
 ## Continuous predictors are linearly related to the $logit(\pi)$
 
--   Continuous predictors : `Age`, `Glucose` and `DiabetesPedigreeFunction`
-
--   For age:
+-   Continuous predictors : `Age`, Glucose and DiabetesPedigreeFunction
 
 ```{r}
 dataRDS$logit <- predict(fit2, type="link")  
@@ -327,9 +325,7 @@ dataRDS %>%
 
 ## Continuous predictors are linearly related to the $logit(\pi)$
 
--   Continuous predictors : `Age`, `Glucose` and `DiabetesPedigreeFunction`
-
--   For glucose:
+-   Continuous predictors : Age, `Glucose` and DiabetesPedigreeFunction
 
 ```{r}
 dataRDS$logit <- predict(fit2, type="link")  
@@ -343,9 +339,7 @@ dataRDS %>%
 
 ## Continuous predictors are linearly related to the $logit(\pi)$
 
--   Continuous predictors : `Age`, `Glucose` and `DiabetesPedigreeFunction`
-
--   For bmipedigreefunction:
+-   Continuous predictors : Age, Glucose and `DiabetesPedigreeFunction`
 
 ```{r}
 dataRDS$logit <- predict(fit2, type="link")  
