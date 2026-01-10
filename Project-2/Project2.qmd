@@ -281,22 +281,6 @@ plot(fit1, c(4,5))
 
 Points that fall outside of the dashed line (Cook's distance) are influential. There are no values which fall outside of the dashed lines, therefore there are no influential observations that need to be handled or discussed. Therefore this assumption is not violated.
 
-### Deviance Residuals
-
-Unlike linear regression, logistic regression does not need constant, finite error variance and normally distributed errors. For logistic regression deviance residuals are useful for determining if the individual points are not fit well by the model.
-
-```{r}
-dr <- resid(fit1, type = "deviance")
-eta <- predict(fit1, type = "link")
-dr_data <- data.frame(residuals = dr,
-                      eta = rep(eta, 3))
-ggplot(dr_data, aes(x = eta, y = residuals)) +
-  geom_point(alpha = 0.35) +
-  geom_smooth(se = FALSE) +
-  labs(title = "Deviance Residuals") +
-  theme_bw()
-```
-
 **Exploring the model**
 
 ```{r}
@@ -342,6 +326,8 @@ plot(rocData)
 ```
 
 ## **Conclusion**
+
+## Literature
 
 Cijfers over diabetes. (n.d.). diabetes.nl. https://www.diabetes.nl/wat-is-diabetes/over-diabetes/cijfers- over-diabetes
 
