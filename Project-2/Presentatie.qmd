@@ -31,25 +31,33 @@ library(GGally)
 
 ## Inhoudsopgave - Leander
 
--   De research vraag
--   De data
--   Modellen
--   Het beste model
--   Assumpties
--   Conclusie model
--   Antwoord research vraag
+-   Research Question
+-   The Data
+-   Models
+-   The Best Model
+-   Assumptions
+-   Conclusion model
+-   Answer Research Question
 
-## Research Questions - Leander
+## Introduction Research Question
+
+-   Diabetes
+
+-   Common
+
+-   Diagnosis
+
+## The Research Question
 
 Can we predict if someone is diabetic using research data with a logistic regression?
 
-## De Dataset
+## The Dataset
 
 ![](images/clipboard-739077630.png)
 
 National Institute of Diabetes and Digestive and Kidney Diseases (1990)
 
-## Data uitleggen - Leander
+## Exploring the data
 
 -   Pregnancies: Number of times pregnant
 
@@ -69,23 +77,22 @@ National Institute of Diabetes and Digestive and Kidney Diseases (1990)
 
 -   Outcome: Class variable (0 or 1)
 
-## Inlezen data Leander
+## Preprocessing
+
+```{r}
+dataRDS <- readRDS("./data/raw/dataset.rds")
+dataRDS <- na.omit(dataRDS) # removes NA from important columns
+saveRDS(dataRDS, "./data/processed/dataset.rds")
+dataset <- readRDS("./data/processed/dataset.rds")
+```
 
 ```{r}
 #| echo: true
 #| output: false
 #| code-line-numbers: true
 #| code-fold: false
-datacsv <- read.csv("./data/raw/diabetes.csv", header = TRUE)
-saveRDS(datacsv, "./data/raw/dataset.rds")
 
-# Preprocessing
-dataRDS <- readRDS("./data/raw/dataset.rds")
-dataRDS <- na.omit(dataRDS) # removes NA from important columns
-saveRDS(dataRDS, "./data/processed/dataset.rds")
-dataset <- readRDS("./data/processed/dataset.rds")
-
-# Recoding BMI to classes, WAAROM OOKALWEER??
+# Recoding BMI to classes
 dataRDS$BMI[dataRDS$BMI <= 18.5 ] <- 1                     # Underweight
 dataRDS$BMI[dataRDS$BMI > 18.5 & dataRDS$BMI <= 25  ] <- 2 # Healthy
 dataRDS$BMI[dataRDS$BMI > 25 & dataRDS$BMI <= 30 ] <- 3    # Overweight
@@ -100,7 +107,7 @@ dataRDS <- subset(dataRDS,
                      BMI != 0)
 ```
 
-## Interessante bevindingen – Leander
+## Interesting Finds
 
 ```{r}
 #| warning: false
@@ -110,7 +117,7 @@ for (i in 1:1) {
   hist(dataRDS[, i],
        main = paste("Histogram of ", col_name),
        xlab = paste("Values of", col_name),
-       col = "lightblue",
+       col = "pink",
        border = "white")
 }
 ```
@@ -123,7 +130,7 @@ for (i in 2:2) {
   hist(dataRDS[, i],
        main = paste("Histogram of ", col_name),
        xlab = paste("Values of", col_name),
-       col = "lightblue",
+       col = "green",
        border = "white")
 }
 ```
@@ -136,12 +143,10 @@ for (i in 3:3) {
   hist(dataRDS[, i],
        main = paste("Histogram of ", col_name),
        xlab = paste("Values of", col_name),
-       col = "lightblue",
+       col = "red",
        border = "white")
 }
 ```
-
-minimum of 90/50 mmHg, maximum of 180/100 mmHg
 
 ## 
 
@@ -151,7 +156,7 @@ for (i in 4:4) {
   hist(dataRDS[, i],
        main = paste("Histogram of ", col_name),
        xlab = paste("Values of", col_name),
-       col = "lightblue",
+       col = "beige",
        border = "white")
 }
 ```
@@ -177,7 +182,7 @@ for (i in 6:6) {
   hist(dataRDS[, i],
        main = paste("Histogram of ", col_name),
        xlab = paste("Values of", col_name),
-       col = "lightblue",
+       col = "orange",
        border = "white")
 }
 ```
@@ -207,7 +212,7 @@ for (i in 8:8) {
   hist(dataRDS[, i],
        main = paste("Histogram of ", col_name),
        xlab = paste("Values of", col_name),
-       col = "lightblue",
+       col = "black",
        border = "white")
 }
 
