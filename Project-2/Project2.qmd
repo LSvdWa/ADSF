@@ -11,7 +11,7 @@ format:
     embed-resources: true
 ---
 
-# **Prediction of glucose using linear regression**
+# **Prediction of glucose using logistic regression**
 
 Demi van den Biggelaar (9660089)\
 August Gesthuizen (5292565)\
@@ -158,6 +158,13 @@ fit3 <- glm(Outcome ~ Glucose + BMI + DiabetesPedigreeFunction,
 fit4 <- glm(Outcome ~ Glucose + BMI,
             family = binomial,
             data = dataRDS)
+
+fit_exploratory <- glm(Outcome ~ Age + Glucose + BMI + DiabetesPedigreeFunction + Age*Glucose,
+                       family = binomial,
+                       data = dataRDS)
+# Compare AIC
+AIC(fit1, fit2, fit_exploratory)
+
 AIC(fit0)
 BIC(fit0)
 
@@ -173,8 +180,61 @@ BIC(fit3)
 AIC(fit4)
 BIC(fit4)
 ```
+Model Comparison Procedure (including moderation)
 
-EXPLAIN WHY 1 IS BETTER THAN ALL OTHERS
+We compared six different models to find the optimal balance between explanatory power and simplicity
+
+We compared the models using 4 different methods
+
+We started with estimating several logistic regression models based on the Akaike Information Criterion (AIC) and Bayesian Information Criterion (BIC), where lower values indicate a better trade-off between model fit and complexity.
+
+Fit 0 (Full Model): Included all available predictors to establish a baseline.
+Although Fit 0 contains all available predictors, it resulted in a higher AIC and several non-significant coefficients. We identified that variables such as BloodPressure, SkinThickness, pregnancies and Insulin were not statistically significant (p > 0.05). 
+
+Fit 1 (Selected Model): A reduced model containing only Age, Glucose, BMI, and DiabetesPedigreeFunction.
+All included predictors show a positive relationship with the outcome and are statistically significant (p < 0.05). This means that an increase in any of these variables is associated with a higher probability of being diagnosed with diabetes. Additionally, fit1 has the lowest AIC/BIC score of all the models. 
+
+Interpertation:
+o	Glucose: As the strongest predictor, higher plasma glucose levels significantly increase the odds of diabetes.
+o	BMI: A higher Body Mass Index is essentially linked to a higher diabetes risk, independent of the glucose level (since the moderation was removed).
+o	Age & Pedigree: Older age and a pedigree function also independently contribute to a higher risk.
+
+Fit 2 (Moderation Model): We hypothesized that the effect of glucose on diabetes risk might be stronger for individuals with a higher BMI. To test this, we added an interaction term (moderation) to fit 1 between Glucose and BMI (Glucose * BMI).
+The moderation was not statistically significant (p > 0.05), suggesting that the effect of Glucose on the probability of diabetes is independent of BMI. So this isn’t the best model either because only more variables are added without a decrease in the AIC/BIC score. 
+
+Fit 3 & 4 (Simplified Models): Models with fewer predictors than fit 1 to test if excluding variables like Age in Fit 3, and both age and DiabetesPedigreeFunction in fit 4 would harm the model fit. 
+As a result, the AIC/BIC increased, which means that these models are under-fitting: they are missing crucial information to make a good prediction.
+
+Exploratory model: We also tested if the impact of glucose levels changes with age making a moderation between age and glucose (age*glucose).
+Similar to the BMI interaction, adding this term increased the complexity of the model without providing a substantial improvement in model fit1
+
+
+To select a reliable model, we look beyond just the AIC/BIC scores. 
+
+ANOVA
+We specifically use this to test whether adding extra complexity, such as moderation (interaction terms), statistically improves the model. It helps us determine if a simpler model (fit1) is sufficient or if a more complex one is required.
+
+We tested whether the interaction between Glucose and BMI (fit2) or Age and Glucose (fit_exploratory) provided added value. The ANOVA test indicated that these moderations were not significant (p > 0.05). Therefore, the extra complexity of moderation does not result in a better prediction, leading us to choose the simpler fit1 model 
+
+Confusion matrix
+Confusion Matrix: This table demonstrates how the model performs in practice by comparing predictions to actual outcomes. It provides insight into the accuracy, as well as how well the model identifies positive cases (sensitivity) versus negative cases (specificity).
+
+ROC Curve
+The ROC curve visualizes the model's diagnostic ability. The AUC (Area Under the Curve) serves as a 'grade' for the model: the closer to 1, the better the model is at distinguishing between individuals with and without diabetes.
+
+Comparison with Complex Models (Fit 2 & Exploratory)
+We generated Confusion Matrixes for the models containing moderation (interactions). We found that the Accuracy and AUC did not improve compared to Fit 1. This confirms that adding complex interactions like Glucose * BMI does not help the model distinguish between diabetic and healthy individuals any better.
+
+Comparison with Simple Models (Fit 3 & 4)
+When looking at the ROC curves, these simpler models show a lower AUC. Their Confusion Matrices reveal a drop in Sensitivity, meaning they fail to identify actual diabetes cases that fit1 successfully catches.
+
+Comparisson with ggpairs-plot to support our choice 
+This choise also aligns with our findings from the ggpairs plot. As shown in the pairs plot, variables such as BloodPressure and SkinThickness exhibited significant overlap between the groups with and without diabetes. Consequently, these variables offered little discriminatory power, whereas Glucose and BMI showed a much clearer separation.
+
+Which model is best?
+We choose model 1 because it is the most efficient model. It contains only the statistically significant variables that truly matter (Age, Glucose, BMI, and Genetic Predisposition) and avoids unnecessary complexity according tot he AIC/BIC scores.
+
+
 
 ## **Assumptions**
 
@@ -302,7 +362,8 @@ ggplot(dr_data, aes(x = eta, y = residuals)) +
 ```{r}
 nullFit <- glm(Outcome ~ 1, family = binomial, data = dataRDS)
 ## Test the fit of our example model:
-anova(nullFit, fit2, test = "Chisq")
+anova(nullfit, fit2, test = "Chisq")
+anova(nullFit, fit_exploratory, test = "Chisq")
 
 car::vif(fit2) # shows no big multicolinearity
 plot(fit2)
