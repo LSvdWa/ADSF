@@ -553,10 +553,20 @@ plot(rocData)
 pROC::auc(rocData)
 ```
 
-## Concludeer en beantwoord - Demi
+## Conclusion
 
-When you click the **Render** button a presentation will be generated that includes both content and the output of embedded code. You can embed code like this:
+- All variables show to be significant in predicting diabetes (p < .05)
+- Odds ratios ranged from 1.052 for age, to 3.093 for the DiabetesPedigreeFunction
+  - Not directly proportional to the relative effect due to variables being measured through different scales
 
-```{r }
-1 + 1
-```
+## 
+
+- The model showed an accuracy value of 78.9%
+- The correct amount of diagnoses for not having diabetes is 81,3%
+  - Model can be used for predicting no diabetes
+
+##
+- Diabetes can be accurately predicted through our chosen model
+  - Age, Glucose, BMI, DiabetesPedigreeFunction
+- Higher specificity due to effects of wrongful diagnoses of false positives
+- Increase of sample for generalisation
