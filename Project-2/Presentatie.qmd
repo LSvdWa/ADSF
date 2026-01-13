@@ -49,7 +49,7 @@ library(GGally)
 
 ## The Research Question
 
-Can we predict if someone is diabetic using research data with a logistic regression?
+Can we predict if someone is diabetic using research data with a logistic regression using Age, Glucose, BMI en DiabetesPedigreeFunction?
 
 ## The Dataset
 
@@ -246,6 +246,10 @@ When you click the **Render** button a presentation will be generated that inclu
 #########VERGEET NIET DE MODERATIES TE BENOEMEN EN KOPPEL HET MISSCHIEN TERUG AAN DE PAIRS TABEL HIERBOVEN, OOK KAN JE ZELF ALTIJD MODELLEN AANPASSEN OM HET VERHAAL BETER TE MAKEN###########
 
 ```{r}
+NulFit <- glm(Outcome ~ 1,  
+            family = binomial,
+            data = dataRDS)
+
 fit0 <- glm(Outcome ~ Age + Pregnancies + Glucose + BloodPressure + SkinThickness + Insulin + BMI + DiabetesPedigreeFunction,  
             family = binomial,
             data = dataRDS)
@@ -360,21 +364,13 @@ dataRDS %>%
 
 ```{r}
 plot(fit1, 5)
+mostInf <- which(cooks.distance(fit1) > 0.04)
+dataRDS[mostInf, ]
 ```
 
 -   No values outside Cook's distance
 
 -   No influential observations
-
-### 
-
-## Deviance Residuals?
-
-When you click the **Render** button a presentation will be generated that includes both content and the output of embedded code. You can embed code like this:
-
-```{r }
-1 + 1
-```
 
 ## Exploring the model section, ga in op het model met onderzoeksmethode uit slides INCLUDING CONFUSION MATRIX - Demi
 
