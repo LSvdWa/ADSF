@@ -510,11 +510,11 @@ Accuracy
 # Calculating accuracy
 ((TP + TN) / (P + N)) * 100
 ```
-Error rate
+Specificity
 
 ```{r }
-# Calculating error rate
-(1 - (TP + TN) / (P + N)) * 100
+# Calculating specificity
+(TN / N) * 100
 ```
 Sensitivity
 
@@ -540,6 +540,7 @@ Negative predictive value
 # Calculating negative predicitve value (NPV)
 (TN / (TN + FN)) * 100
 ```
+
 
 
 
