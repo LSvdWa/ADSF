@@ -437,19 +437,60 @@ plot(fit1.2, 5)
 
 ## Coefficients
 
--   
-
 ```{r }
 summary(fit1)$coefficients
 ```
 
-## Odds ratios
+## 
 
--   
+
+-   The expected log-odds of diabetes for a zero-year-old with no glucose levels, BMI, or DiabetesPedigreeFunction are -11.103.
+-   An individual’s age significantly predicts their probability of diabetes, after controlling for glucose, BMI, and DiabetesPedigreeFunction (𝛽 = .051, z = 3.758, p \< .000).
+    -   For each additional year of age, the expected log-odds of having diabetes increases with .051 units.
+
+## 
+
+-   An individual’s glucose levels significantly predicts their probability of diabetes, after controlling for age, BMI, and DiabetesPedigreeFunction (𝛽 = .036, z = 7.099, p \< 1.26e-12).
+    -   For each additional level of glucose, the expected log-odds of having diabetes increases with .036 units.
+-   An individual’s BMI significantly predicts their probability of diabetes, after controlling for age, glucose, and DiabetesPedigreeFunction (𝛽 = .999, z = 3.859, p \< .000).
+    -   For each additional level of BMI, the expected log-odds of having diabetes increases with .999 units.
+
+## 
+
+-   An individual’s DiabetesPedigreeFunction significantly predicts their probability of diabetes, after controlling for age, glucose, and BMI (𝛽 = 1.129, z = 2.731, p \< .006).
+    -   For each additional DiabetesPedigreeFunction, the expected log-odds of having diabetes increases with 1.129 units.
+
+## Odds ratios
 
 ```{r}
 exp(coef(fit1))
 ```
+
+-   The expected odds ratio for age are 1.052, or a 5,2% increase in the odds of having diabetes for every increasing value of age.
+
+-   The expected odds ratio for glucose are 1.036 or a 3.6% increase in the odds of having diabetes for every increasing value of glucose.
+
+## 
+
+-   The expected odds ratio for BMI are 2.715 or a 171,5% increase in the odds of having diabetes for every increasing value of BMI.
+
+-   The expected odds ratio for DiabetesPedigreeFunction are 3.093 or a 209.3% increase in the odds of having diabetes for every increasing value of diabetes pedigree function.
+
+## Confusion Matrix
+```{r}
+dataRDS %<>%
+  mutate(piHat = predict(fit1, type = "response"),
+         yHat = as.factor(ifelse(piHat <= 0.5, 0, 1))
+
+cMat <- dataRDS %$% confusionMatrix(data = yHat, reference = Outcome)
+
+cMat$table
+```
+
+- A total of 393 individuals
+  - 263 negative; no diabetes
+  - 130 positive; diabetes
+  - 234 of those 263 were correctly estimated to not have diabetes
 
 ## Concludeer en beantwoord - Demi
 
