@@ -29,7 +29,7 @@ library(GGally)
 
 ```
 
-## Inhoudsopgave - Leander
+## Inhoudsopgave
 
 -   Research Question
 -   The Data
@@ -244,27 +244,9 @@ ggpairs(dataRDS)
 
 ![](images/clipboard-576732806.png)
 
-## Model summary's (including moderations)
+## Model summary's - Fit 6
 
 ```{r}
-
-summary(fit1)
-summary(fit2)
-summary(fit6)
-
-```
-
-## Best model fit
-
--   fit1 \<- glm(Outcome \~ Age + Glucose + BMI + DiabetesPedigreeFunction,\
-    family = binomial, data = dataRDS)
--   comparison with ggpairsplot
--   Interpertation
-
-```{r}
-NulFit <- glm(Outcome ~ 1,  
-            family = binomial,
-            data = dataRDS)
 
 fit0 <- glm(Outcome ~ Age + Pregnancies + Glucose + BloodPressure + SkinThickness + Insulin + BMI + DiabetesPedigreeFunction,  
             family = binomial,
@@ -286,12 +268,47 @@ fit4 <- glm(Outcome ~ Glucose + BMI,
             family = binomial,
             data = dataRDS)
 
-fit33 <- glm(Outcome ~ Glucose + BMI + DiabetesPedigreeFunction + Age*Pregnancies, 
+fit5 <- glm(Outcome ~ Age + Glucose + BMI + DiabetesPedigreeFunction + Age*Glucose,
+                       family = binomial,
+                       data = dataRDS)
+fit6 <- glm(Outcome ~ Glucose + BMI + DiabetesPedigreeFunction + Age*Pregnancies, 
             family = binomial,
             data = dataRDS)
 
-anova(NulFit, fit1)
+
+summary(fit6)
+
 ```
+
+## Fit 2
+
+```{r}
+summary(fit2)
+
+```
+
+## Fit 1
+```{r}
+summary(fit1)
+
+```
+
+## Best model fit
+```{r}
+#| echo: true
+#| output: false
+#| code-line-numbers: true
+#| code-fold: false
+fit1 <- glm(Outcome ~ Age + Glucose + BMI + DiabetesPedigreeFunction,  
+            family = binomial,
+            data = dataRDS)
+```
+
+-   fit1 \<- glm(Outcome \~ Age + Glucose + BMI + DiabetesPedigreeFunction,\
+    family = binomial, data = dataRDS)
+-   comparison with ggpairsplot
+-   Interpertation
+
 
 ## Binary dependent variable
 
