@@ -303,11 +303,8 @@ fit1 <- glm(Outcome ~ Age + Glucose + BMI + DiabetesPedigreeFunction,
             family = binomial,
             data = dataRDS)
 ```
-
--   fit1 \<- glm(Outcome \~ Age + Glucose + BMI + DiabetesPedigreeFunction,\
-    family = binomial, data = dataRDS)
 -   comparison with ggpairsplot
--   Interpertation
+-   Interpretation
 
 
 ## Binary dependent variable
