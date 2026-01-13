@@ -479,19 +479,104 @@ exp(coef(fit1))
 ## Confusion Matrix
 ```{r}
 library(magrittr)
+## Add predictions to the dataset:
 dataRDS %<>%
   mutate(piHat = predict(fit1, type = "response"),
          yHat = as.factor(ifelse(piHat <= 0.5, 0, 1))
-
+  )
+library(caret)
 cMat <- dataRDS %$% confusionMatrix(data = yHat, reference = Outcome)
 
-cMat$table
 ```
 
 - A total of 393 individuals
   - 263 negative; no diabetes
   - 130 positive; diabetes
   - 234 of those 263 were correctly estimated to not have diabetes
+  
+## Concludeer en beantwoord
+
+
+
+```{r }
+cMat$table
+TP <- 76
+TN <- 234
+FP <- 29
+FN <- 54
+P <- (TP + FN)
+N <- (TN + FP)
+```
+
+True Positive
+```{r }
+TP 
+```
+
+True Negative
+```{r }
+TN 
+```
+
+False Positive
+```{r }
+FP 
+```
+
+False Negative
+```{r }
+FN
+```
+
+## 
+Accuracy
+
+```{r }
+# Calculating accuracy
+((TP + TN) / (P + N)) * 100
+```
+Error rate
+
+```{r }
+# Calculating error rate
+(1 - (TP + TN) / (P + N)) * 100
+```
+Sensitivity
+
+```{r }
+# Calculating sensitivity
+(TP / P) * 100
+```
+Positive Predictive Value
+
+```{r }
+# Calculating positive predictive value (PPV)
+(TP / (TP + FP)) * 100
+```
+False Positive Rate
+
+```{r }
+# Calculating false positive rate (FPR)
+(1 - (TN / N)) * 100
+```
+Negative predictive value
+
+```{r }
+# Calculating negative predicitve value (NPV)
+(TN / (TN + FN)) * 100
+```
+
+
+
+## ROC
+```{r }
+# ROC curve, Plots sensitivity against specificity at different threshold values
+rocData <- dataRDS %$%
+  pROC::roc(Outcome, piHat)
+plot(rocData)
+# The area under the curve is a one number summary of performance. Does not depend on classification threshold
+pROC::auc(rocData)
+```
 
 ## Concludeer en beantwoord - Demi
 
