@@ -288,7 +288,7 @@ Logistic regression models assume linear relationship between predictor variable
 
 ```{r}
 # making the logit
-dataRDS$logit <- predict(fit2, type="link")
+dataRDS$logit <- predict(fit1, type="link")
 
 # plotting the relations
 dataRDS %>%
@@ -322,7 +322,26 @@ The Cook's distance plot shows the top 3 largest values. Not all outliers are in
 plot(fit1, c(4,5))
 ```
 
-Points that fall outside of the dashed line (Cook's distance) are influential. There are no values which fall outside of the dashed lines, therefore there are no influential observations that need to be handled or discussed. Therefore this assumption is not violated.
+Points that fall outside of the dashed line (Cook's distance) are influential. There are no values which fall outside of the dashed lines, but to be sure we still look at what removing the most influential cases does.
+
+```{r}
+mostInf <- which(cooks.distance(fit1) > 0.04823)
+dataRDS[mostInf, ]
+dataRDS2 <- dataRDS[-mostInf, ]
+glmFit2 <- update(fit1, data = dataRDS2)
+
+```
+
+```{r}
+
+summary(fit1)$coef |> round(3)
+summary(glmFit2)$coef |> round(3)
+
+summary(fit1)
+summary(glmFit2)
+```
+
+We see that removing the three most influential cases.
 
 **Exploring the model**
 
