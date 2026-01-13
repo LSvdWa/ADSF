@@ -269,6 +269,12 @@ fit3 <- glm(Outcome ~ Glucose + BMI + DiabetesPedigreeFunction,
 fit4 <- glm(Outcome ~ Glucose + BMI,
             family = binomial,
             data = dataRDS)
+
+fit33 <- glm(Outcome ~ Glucose + BMI + DiabetesPedigreeFunction + Age*Pregnancies, 
+            family = binomial,
+            data = dataRDS)
+
+anova(NulFit, fit1)
 ```
 
 ## Binary dependent variable

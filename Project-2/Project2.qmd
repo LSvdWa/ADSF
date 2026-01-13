@@ -344,7 +344,7 @@ summary(fit1Altered)$coef |> round(3)
 ```{r}
 # compare the deviances and AIC
 data.frame(
-  Model = c("fit1", "glmFit2"),
+  Model = c("fit1", "fit2"),
   Null_Deviance = round(c(fit1$null.deviance, glmFit2$null.deviance), 3),
   Residual_Deviance = round(c(fit1$deviance, glmFit2$deviance), 3),
   AIC = round(c(fit1$aic, glmFit2$aic), 2)
@@ -377,6 +377,10 @@ To look at the efficiency of predictions of our model, a confusion matrix was pr
 
 ```{r}
 ## Generating confusion matrix
+dataRDS %<>%
+  mutate(piHat = predict(fit1, type = "response"),
+         yHat = as.factor(ifelse(piHat <= 0.5, 0, 1))
+  )
 cMat <- dataRDS %$% confusionMatrix(data = yHat, reference = Outcome)
 
 cMat$table
