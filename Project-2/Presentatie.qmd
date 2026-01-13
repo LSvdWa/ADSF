@@ -240,10 +240,26 @@ ggpairs(dataRDS)
 
 ```
 
-## Beste model kiezen en uitleggen (leg uit wat het beste model is, wat het doet en waarom het het beste is) - August
+## Model comparison
 
-When you click the **Render** button a presentation will be generated that includes both content and the output of embedded code. You can embed code like this:\
-#########VERGEET NIET DE MODERATIES TE BENOEMEN EN KOPPEL HET MISSCHIEN TERUG AAN DE PAIRS TABEL HIERBOVEN, OOK KAN JE ZELF ALTIJD MODELLEN AANPASSEN OM HET VERHAAL BETER TE MAKEN###########
+![](images/clipboard-576732806.png)
+
+## Model summary's (including moderations)
+
+```{r}
+
+summary(fit1)
+summary(fit2)
+summary(fit6)
+
+```
+
+## Best model fit
+
+-   fit1 \<- glm(Outcome \~ Age + Glucose + BMI + DiabetesPedigreeFunction,\
+    family = binomial, data = dataRDS)
+-   comparison with ggpairsplot
+-   Interpertation
 
 ```{r}
 NulFit <- glm(Outcome ~ 1,  
@@ -406,7 +422,7 @@ summary(fit1)$coefficients
 
 ## Odds ratios
 
-- 
+-   
 
 ```{r}
 exp(coef(fit1))

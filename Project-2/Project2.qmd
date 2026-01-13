@@ -159,26 +159,32 @@ fit4 <- glm(Outcome ~ Glucose + BMI,
             family = binomial,
             data = dataRDS)
 
-fit_exploratory <- glm(Outcome ~ Age + Glucose + BMI + DiabetesPedigreeFunction + Age*Glucose,
+fit5 <- glm(Outcome ~ Age + Glucose + BMI + DiabetesPedigreeFunction + Age*Glucose,
                        family = binomial,
                        data = dataRDS)
-# Compare AIC
-AIC(fit1, fit2, fit_exploratory)
+fit6 <- glm(Outcome ~ Glucose + BMI + DiabetesPedigreeFunction + Age*Pregnancies, 
+            family = binomial,
+            data = dataRDS)
 
 AIC(fit0)
 BIC(fit0)
 
 # fit1 is best
+summary(fit1)
 AIC(fit1)
 BIC(fit1)
-summary(fit1)
-
 AIC(fit2)
 BIC(fit2)
 AIC(fit3)
 BIC(fit3)
 AIC(fit4)
 BIC(fit4)
+AIC(fit5)
+BIC(fit5)
+AIC(fit6)
+BIC(fit6)
+
+
 ```
 
 Model Comparison Procedure (including moderation)
