@@ -333,7 +333,7 @@ fit1Altered <- update(fit1, data = dataRDS2)
 
 ```
 
-First the three most influential cases are selected and a dataset and fit without those are made.
+First the three most influential cases are selected and a data set and fit without those are made.
 
 ```{r}
 # compare the coefficients
