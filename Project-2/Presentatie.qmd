@@ -478,6 +478,7 @@ exp(coef(fit1))
 
 ## Confusion Matrix
 ```{r}
+library(magrittr)
 dataRDS %<>%
   mutate(piHat = predict(fit1, type = "response"),
          yHat = as.factor(ifelse(piHat <= 0.5, 0, 1))
