@@ -325,68 +325,33 @@ plot(fit1, c(4,5))
 Points that fall outside of the dashed line (Cook's distance) are influential. There are no values which fall outside of the dashed lines, but to be sure we still look at what removing the most influential cases does.
 
 ```{r}
+# select the three most influential cases
 mostInf <- which(cooks.distance(fit1) > 0.04823)
 dataRDS[mostInf, ]
 dataRDS2 <- dataRDS[-mostInf, ]
-glmFit2 <- update(fit1, data = dataRDS2)
+fit1Altered <- update(fit1, data = dataRDS2)
 
 ```
 
-```{r}
+First the three most influential cases are selected and a dataset and fit without those are made.
 
+```{r}
+# compare the coefficients
 summary(fit1)$coef |> round(3)
-summary(glmFit2)$coef |> round(3)
-
-summary(fit1)
-summary(glmFit2)
+summary(fit1Altered)$coef |> round(3)
 ```
-
-We see that removing the three most influential cases.
-
-**Exploring the model**
 
 ```{r}
-nullFit <- glm(Outcome ~ 1, family = binomial, data = dataRDS)
-## Test the fit of our example model:
-anova(nullfit, fit2, test = "Chisq")
-anova(nullFit, fit_exploratory, test = "Chisq")
-
-car::vif(fit2) # shows no big multicolinearity
-plot(fit2)
-plot(fit2, 4)
-
-
-car::crPlots(fit2, "Glucose")
-dfbetas(fit2)[ , "Glucose"] |> plot()
-
-# read performance
-library(dplyr)
-## Add predictions to the dataset:
-dataRDS <- dataRDS %>%
-  mutate(
-    piHat = predict(fit2, type = "response"),  # predicted probabilities
-    yHat  = factor(ifelse(piHat > 0.5, 1, 0), levels = c(0, 1))
-  )
-
-# Make levels the same
-dataRDS$y <- factor(dataRDS$y, levels = c(0, 1))
-
-library(caret)
-cMat <- confusionMatrix(
-  data = dataRDS$yHat,
-  reference = dataRDS$y
+# compare the deviances and AIC
+data.frame(
+  Model = c("fit1", "glmFit2"),
+  Null_Deviance = round(c(fit1$null.deviance, glmFit2$null.deviance), 3),
+  Residual_Deviance = round(c(fit1$deviance, glmFit2$deviance), 3),
+  AIC = round(c(fit1$aic, glmFit2$aic), 2)
 )
-
-cMat$table
-cMat$byClass
-
-# ROC Curve
-rocData <- dataRDS %>%
-pROC::roc(Outcome, piHat)
-plot(rocData)
-
-#CEE for comparison good models
 ```
+
+Then we compare the coefficients and some statistics. In the coefficients we see that the intercept and the pedigree function change most, but there are no changes massively impacting the fit. We do see that removing the three most influential cases reduces the AIC score by more than 20 points. Therefore, we decide to keep those values out of the model and continue with the new improved model.
 
 ## **Interpretation**
 
@@ -464,7 +429,7 @@ The AUC value is .8618 which falls within the range of 0.8 - 0.9 and is consider
 
 All in all, both Age, Glucose, BMI and the diabetes pedigree function have shown to be significant in predicting diabetes in females of at least 21 years of age from a Pima Indian heritage, showing p-values that were far below any reasonable significance level, implying strong evidence of their predictive nature for this disease. Odds ratios associated with these predictors ranged from 1.052 for age, to 3.093 for the diabetes pedigree function, though a notion should be made that this variety is not directly proportional to the relative effect of one variable on the odds of having diabetes, as not all variables were measured on the same scale (age ranged from x-y, whereas BMI was categorized to values ranging from 1 to 4, potentially explaining its rather high odds ratio of 2.715).
 
-Model performance itself was concluded to be relatively sufficient, showing an accuracy value of 78.9% showed that most predictions were indeed correct. Subsequently checking balanced accuracy, found to be equal to 73.7%, showed that even though a slight deviance between positive prediction power and negative prediction power exists, the model still suffices to predict both most positive and negative cases correctly. Finally, ROC curve analysis showed a relatively good balance between specificity and sensitivity, producing an Area Under Curve (AUC) value of ~0.862. Though since this model predicts diagnoses, where a false positive can have severe consequences, the model might require a higher specificity.
+Model performance itself was concluded to be relatively sufficient, showing an accuracy value of 78.9% showed that most predictions were indeed correct. Subsequently checking balanced accuracy, found to be equal to 73.7%, showed that even though a slight deviance between positive prediction power and negative prediction power exists, the model still suffices to predict both most positive and negative cases correctly. Finally, ROC curve analysis showed a relatively good balance between specificity and sensitivity, producing an Area Under Curve (AUC) value of \~0.862. Though since this model predicts diagnoses, where a false positive can have severe consequences, the model might require a higher specificity.
 
 ## Literature
 
