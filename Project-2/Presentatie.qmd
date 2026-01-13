@@ -383,7 +383,6 @@ mostInf <- which(cooks.distance(fit1) > 0.04823)
 dataRDS[mostInf, c("Glucose", "Age", "BMI", "DiabetesPedigreeFunction")]
 ```
 
-
 ## Removing most influential observations
 
 ```{r}
@@ -397,14 +396,20 @@ data.frame(
 )
 ```
 
+## Coefficients
 
-
-## Exploring the model section, ga in op het model met onderzoeksmethode uit slides INCLUDING CONFUSION MATRIX - Demi
-
-When you click the **Render** button a presentation will be generated that includes both content and the output of embedded code. You can embed code like this:
+-   
 
 ```{r }
-1 + 1
+summary(fit1)$coefficients
+```
+
+## Odds ratios
+
+- 
+
+```{r}
+exp(coef(fit1))
 ```
 
 ## Concludeer en beantwoord - Demi

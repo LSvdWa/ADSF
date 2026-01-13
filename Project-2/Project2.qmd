@@ -344,10 +344,10 @@ summary(fit1Altered)$coef |> round(3)
 ```{r}
 # compare the deviances and AIC
 data.frame(
-  Model = c("fit1", "fit2"),
-  Null_Deviance = round(c(fit1$null.deviance, glmFit2$null.deviance), 3),
-  Residual_Deviance = round(c(fit1$deviance, glmFit2$deviance), 3),
-  AIC = round(c(fit1$aic, glmFit2$aic), 2)
+  Model = c("fit1", "fit1Altered"),
+  Null_Deviance = round(c(fit1$null.deviance, fit1Altered$null.deviance), 3),
+  Residual_Deviance = round(c(fit1$deviance, fit1Altered$deviance), 3),
+  AIC = round(c(fit1$aic, fit1Altered$aic), 2)
 )
 ```
 
@@ -369,7 +369,7 @@ coef(fit1) |> exp()
 
 ### Coefficients and odds ratio analysis
 
-The intercept was found to differ significantly from zero, showing the baseline log-odds of an individual having diabetes to be equal to -11.102 with a corresponding odds ratio of 1.51e-05 (β = -11.102, z = -8.674, p \< 2e-16). Age shows a value of .051 log-odds with an odds ratio of 1.052 or a 5,2% increase in the odds of having diabetes for every increasing value of age (β = .051, z = .013, p \< .000). For glucose, the log-odds are .036 and the odds ratio 1.036 or a 3.6% increase in the odds of having diabetes for every increasing value of glucose (β = .036, z = .005, p \< 1.26e-12). BMI shows a log-odds of .999 with a corresponding odds ratio of 2.715 or a 171,5% increase in the odds of having diabetes for every increasing value of BMI (β = .999, z = .259, p \< .000). With BMI it is different since it is not a continuous variable, and thus the 171,5% increase counts for the increase in BMI category. Diabetes pedigree function shows a log-odds of 1.129 and an odds ratio of 3.093 or a 209.3% increase in the odds of having diabetes for every increasing value of diabetes pedigree function (β = 1.129, z = 3.093, p \< .006). All coefficients are significant (p \< .05) with BMI and Diabetes pedigree function showing the highest percentage increase. This however may be due to the range of values in the data set seeing as BMI has only 4 categories and Diabetes pedigree function has a range of .08 to 2.42, which can also explain the larger odds ratio values compared to the other variables.
+The intercept was found to differ significantly from zero, showing the baseline log-odds of an individual having diabetes to be equal to -11.103 with a corresponding odds ratio of 1.51e-05 (β = -11.103, z = -8.674, p \< 2e-16). Age shows a value of .051 log-odds with an odds ratio of 1.052 or a 5,2% increase in the odds of having diabetes for every increasing value of age (β = .051, z = 3.758, p \< .000). For glucose, the log-odds are .036 and the odds ratio 1.036 or a 3.6% increase in the odds of having diabetes for every increasing value of glucose (β = .036, z = 7.099, p \< 1.26e-12). BMI shows a log-odds of .999 with a corresponding odds ratio of 2.715 or a 171,5% increase in the odds of having diabetes for every increasing value of BMI (β = .999, z = 3.859, p \< .000). With BMI it is different since it is not a continuous variable, and thus the 171,5% increase counts for the increase in BMI category. Diabetes pedigree function shows a log-odds of 1.129 and an odds ratio of 3.093 or a 209.3% increase in the odds of having diabetes for every increasing value of diabetes pedigree function (β = 1.129, z = 2.731, p \< .006). All coefficients are significant (p \< .05) with BMI and Diabetes pedigree function showing the highest percentage increase. This however may be due to the range of values in the data set seeing as BMI has only 4 categories and Diabetes pedigree function has a range of .08 to 2.42, which can also explain the larger odds ratio values compared to the other variables.
 
 ### Confusion matrix
 
@@ -431,7 +431,7 @@ The AUC value is .8618 which falls within the range of 0.8 - 0.9 and is consider
 
 ## **Conclusion**
 
-All in all, both Age, Glucose, BMI and the diabetes pedigree function have shown to be significant in predicting diabetes in females of at least 21 years of age from a Pima Indian heritage, showing p-values that were far below any reasonable significance level, implying strong evidence of their predictive nature for this disease. Odds ratios associated with these predictors ranged from 1.052 for age, to 3.093 for the diabetes pedigree function, though a notion should be made that this variety is not directly proportional to the relative effect of one variable on the odds of having diabetes, as not all variables were measured on the same scale (age ranged from x-y, whereas BMI was categorized to values ranging from 1 to 4, potentially explaining its rather high odds ratio of 2.715).
+All in all, both Age, Glucose, BMI, and the DiabetesPedigreeFunction have shown to be significant in predicting diabetes in females of at least 21 years of age from a Pima Indian heritage, showing p-values that were far below any reasonable significance level, implying strong evidence of their predictive nature for this disease. Odds ratios associated with these predictors ranged from 1.052 for age, to 3.093 for the diabetes pedigree function, though a notion should be made that this variety is not directly proportional to the relative effect of one variable on the odds of having diabetes, as not all variables were measured on the same scale (age ranged from x-y, whereas BMI was categorized to values ranging from 1 to 4, potentially explaining its rather high odds ratio of 2.715).
 
 Model performance itself was concluded to be relatively sufficient, showing an accuracy value of 78.9% showed that most predictions were indeed correct. Subsequently checking balanced accuracy, found to be equal to 73.7%, showed that even though a slight deviance between positive prediction power and negative prediction power exists, the model still suffices to predict both most positive and negative cases correctly. Finally, ROC curve analysis showed a relatively good balance between specificity and sensitivity, producing an Area Under Curve (AUC) value of \~0.862. Though since this model predicts diagnoses, where a false positive can have severe consequences, the model might require a higher specificity.
 
