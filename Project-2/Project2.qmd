@@ -443,6 +443,10 @@ The AUC value is .8618 which falls within the range of 0.8 - 0.9 and is consider
 
 ## **Conclusion**
 
+All in all, both Age, Glucose, BMI and the diabetes pedigree function have shown to be significant in predicting diabetes in females of at least 21 years of age from a Pima Indian heritage, showing p-values that were far below any reasonable significance level, implying strong evidence of their predictive nature for this disease. Odds ratios associated with these predictors ranged from 1.052 for age, to 3.093 for the diabetes pedigree function, though a notion should be made that this variety is not directly proportional to the relative effect of one variable on the odds of having diabetes, as not all variables were measured on the same scale (age ranged from x-y, whereas BMI was categorized to values ranging from 1 to 4, potentially explaining its rather high odds ratio of 2.715).
+
+Model performance itself was concluded to be relatively sufficient, showing an accuracy value of 78.9% showed that most predictions were indeed correct. Subsequently checking balanced accuracy, found to be equal to 73.7%, showed that even though a slight deviance between positive prediction power and negative prediction power exists, the model still suffices to predict both most positive and negative cases correctly. Finally, ROC curve analysis showed a relatively good balance between specificity and sensitivity, producing an Area Under Curve (AUC) value of ~0.862. Though since this model predicts diagnoses, where a false positive can have severe consequences, the model might require a higher specificity.
+
 ## Literature
 
 Cijfers over diabetes. (n.d.). diabetes.nl. https://www.diabetes.nl/wat-is-diabetes/over-diabetes/cijfers- over-diabetes
