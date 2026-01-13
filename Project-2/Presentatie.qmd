@@ -364,13 +364,34 @@ dataRDS %>%
 
 ```{r}
 plot(fit1, 5)
-mostInf <- which(cooks.distance(fit1) > 0.04)
-dataRDS[mostInf, ]
 ```
 
 -   No values outside Cook's distance
 
--   No influential observations
+-   Maybe influential observations?
+
+## Most influential observations
+
+```{r}
+mostInf <- which(cooks.distance(fit1) > 0.04823)
+dataRDS[mostInf, c("Glucose", "Age", "BMI", "DiabetesPedigreeFunction")]
+```
+
+
+## Removing most influential observations
+
+```{r}
+dataRDS2 <- dataRDS[-mostInf, ]
+fit1Altered <- update(fit1, data = dataRDS2)
+data.frame(
+  Model = c("fit1", "fit1Altered"),
+  Null_Deviance = round(c(fit1$null.deviance, fit1Altered$null.deviance), 3),
+  Residual_Deviance = round(c(fit1$deviance, fit1Altered$deviance), 3),
+  AIC = round(c(fit1$aic, fit1Altered$aic), 2)
+)
+```
+
+
 
 ## Exploring the model section, ga in op het model met onderzoeksmethode uit slides INCLUDING CONFUSION MATRIX - Demi
 
