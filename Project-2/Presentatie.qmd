@@ -501,26 +501,7 @@ cMat$table
   - 130 positive; diabetes
   - 234 of those 263 were correctly estimated to not have diabetes
   
-## Concludeer en beantwoord
-True Positive
-```{r }
-TP 
-```
 
-True Negative
-```{r }
-TN 
-```
-
-False Positive
-```{r }
-FP 
-```
-
-False Negative
-```{r }
-FN
-```
 
 ## 
 Accuracy
