@@ -492,6 +492,7 @@ FP <- 29
 FN <- 54
 P <- (TP + FN)
 N <- (TN + FP)
+cMat$table
 
 ```
 
@@ -500,6 +501,66 @@ N <- (TN + FP)
   - 130 positive; diabetes
   - 234 of those 263 were correctly estimated to not have diabetes
   
+## Concludeer en beantwoord
+True Positive
+```{r }
+TP 
+```
+
+True Negative
+```{r }
+TN 
+```
+
+False Positive
+```{r }
+FP 
+```
+
+False Negative
+```{r }
+FN
+```
+
+## 
+Accuracy
+
+```{r }
+# Calculating accuracy
+((TP + TN) / (P + N)) * 100
+```
+Error rate
+
+```{r }
+# Calculating error rate
+(1 - (TP + TN) / (P + N)) * 100
+```
+Sensitivity
+
+```{r }
+# Calculating sensitivity
+(TP / P) * 100
+```
+Positive Predictive Value
+
+```{r }
+# Calculating positive predictive value (PPV)
+(TP / (TP + FP)) * 100
+```
+False Positive Rate
+
+```{r }
+# Calculating false positive rate (FPR)
+(1 - (TN / N)) * 100
+```
+Negative predictive value
+
+```{r }
+# Calculating negative predicitve value (NPV)
+(TN / (TN + FN)) * 100
+```
+
+
 
 ## ROC
 ```{r }
