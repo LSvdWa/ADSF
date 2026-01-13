@@ -387,18 +387,27 @@ dataRDS[mostInf, c("Glucose", "Age", "BMI", "DiabetesPedigreeFunction")]
 
 ```{r}
 dataRDS2 <- dataRDS[-mostInf, ]
-fit1Altered <- update(fit1, data = dataRDS2)
+fit1.2 <- update(fit1, data = dataRDS2)
 data.frame(
-  Model = c("fit1", "fit1Altered"),
-  Null_Deviance = round(c(fit1$null.deviance, fit1Altered$null.deviance), 3),
-  Residual_Deviance = round(c(fit1$deviance, fit1Altered$deviance), 3),
-  AIC = round(c(fit1$aic, fit1Altered$aic), 2)
+  Model = c("fit1", "fit1.2"),
+  Null_Deviance = round(c(fit1$null.deviance, fit1.2$null.deviance), 3),
+  Residual_Deviance = round(c(fit1$deviance, fit1.2$deviance), 3),
+  AIC = round(c(fit1$aic, fit1.2$aic), 2)
 )
 ```
 
-## Coefficients
+## Updated model
 
--   
+```{r}
+par(mfrow = c(1, 2))
+plot(fit1, 5)
+plot(fit1.2, 5)
+
+```
+
+## Exploring the model section, ga in op het model met onderzoeksmethode uit slides INCLUDING CONFUSION MATRIX - Demi
+
+When you click the **Render** button a presentation will be generated that includes both content and the output of embedded code. You can embed code like this:
 
 ```{r }
 summary(fit1)$coefficients
