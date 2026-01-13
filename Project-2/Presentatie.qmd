@@ -487,46 +487,14 @@ dataRDS %<>%
 library(caret)
 cMat <- dataRDS %$% confusionMatrix(data = yHat, reference = Outcome)
 
+cMat$table
 ```
 
 - A total of 393 individuals
   - 263 negative; no diabetes
   - 130 positive; diabetes
   - 234 of those 263 were correctly estimated to not have diabetes
-  
-## Concludeer en beantwoord
 
-
-
-```{r }
-cMat$table
-TP <- 76
-TN <- 234
-FP <- 29
-FN <- 54
-P <- (TP + FN)
-N <- (TN + FP)
-```
-
-True Positive
-```{r }
-TP 
-```
-
-True Negative
-```{r }
-TN 
-```
-
-False Positive
-```{r }
-FP 
-```
-
-False Negative
-```{r }
-FN
-```
 
 ## 
 Accuracy
