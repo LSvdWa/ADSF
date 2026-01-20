@@ -1,13 +1,14 @@
 ---
-title:  "Predicting glucose"
-authors:  
+title: "Predicting Glucose"
+authors:
 - "Demi van den Biggelaar (9660089)"
 - "August Gesthuizen (5292565)"
 - "Friso Harff (7526946)"
 - "Leander van der Waal (7180063)"
-date:  "2025-12-08"
-format:  "html"
-warning: false
+date: "2026-01-26"
+format:
+  html:
+    embed-resources: true
 ---
 
 ------------------------------------------------------------------------
@@ -47,7 +48,7 @@ The different parameters in the dataset are:
 
 ## **Preprocessing & Loading data**
 
-To preprocess the data we categorized the BMI into four categories, being underweight, healthy, overweight and obese. We removed missing values from Glucose, BMI, SkinThickness and Insulin.  
+To preprocess the data we categorized the BMI into four categories, being underweight, healthy, overweight and obese. We removed missing values from Glucose, BMI, SkinThickness and Insulin.
 
 ------------------------------------------------------------------------
 
