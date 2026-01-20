@@ -1,25 +1,17 @@
 ---
-title: "Predicting Diabetes"
+title: "Predicting Glucose"
 authors:
 - "Demi van den Biggelaar (9660089)"
 - "August Gesthuizen (5292565)"
 - "Friso Harff (7526946)"
 - "Leander van der Waal (7180063)"
-date: "2026-01-15"
+date: "2026-01-24"
 format:
   html:
     embed-resources: true
 ---
 
-
-# **Prediction of glucose using linear regression**
-
-Demi van den Biggelaar (9660089)\
-August Gesthuizen (5292565)\
-Friso Harff (7526946)\
-Leander van der Waal (7180063)\
-
-## **Introduction**
+**Introduction**
 
 1 in 14 Dutch citizens has diabetes (Cijfers Over Diabetes, z.d.). To treat diabetes more effectively and to prevent serious complications it is crucial to diagnose it as early as possible. Having diabetes means that there is a shortage of insulin in the body, causing glucose to stay in the blood instead, which can cause a range of complications (Umcu, z.d.). Diabetes can be diagnosed by measuring the plasma glucose concentration in the blood (Diabetes Mellitus Type 2 \| LUMC, z.d.). To diagnose diabetes faster we want to know if we can predict glucose levels based on other parameters.
 
@@ -129,31 +121,97 @@ Above you can see multiple ways that our variables are described. They are repre
 
 -   **Outcome:** 0 or 1 value representing if someone has diabetes or not. Most participants don’t have diabetes.
 
-
 ## **Building the model**
 
 ```{r}
 #| warning: false
 
-########################## AAAAAAADDDDDDDDDDDDDDDDDD MODERATION #####################
-# model with all columns as predictors
-model <- lm(Glucose ~ Age + Insulin + BMI + Pregnancies + BloodPressure + SkinThickness + DiabetesPedigreeFunction, 
-             data = dataRDS)
-# model with all predictor p < 0.05 
-model2 <- lm(Glucose ~ Age + Insulin + BMI + SkinThickness + DiabetesPedigreeFunction, 
-             data = dataRDS)
-# model with all predictors p < 0.01 and moderation
-model3 <- lm(Glucose ~ Age + Insulin + BMI + SkinThickness , 
-             data = dataRDS)
 
-# Ask for summary statistics again
-summary(model)
-summary(model2)
-summary(model3)
+# List of all models we could think of.
+models <- list(
 
-# anova model to compare models
-anova(model, model2, model3)
+ # model with all predictor p < 0.05 
+ mod2 = lm(Glucose ~ Age + Insulin + BMI + SkinThickness + DiabetesPedigreeFunction, 
+              data = dataRDS),
+ # model with all predictors p < 0.01 and moderation
+ mod3 = lm(Glucose ~ Age + Insulin + BMI + SkinThickness , 
+              data = dataRDS),
+ 
+ mod4 = lm(Glucose ~ Insulin + BMI + SkinThickness + Age*Pregnancies, 
+              data = dataRDS),
+ # model with all predictors p < 0.01 and moderation
+ mod6 = lm(Glucose ~ Age + Insulin + BMI, 
+              data = dataRDS),
+  m1_full =
+    lm(Glucose ~ Age + Insulin + BMI + Pregnancies +
+         BloodPressure + SkinThickness + DiabetesPedigreeFunction,
+       data = dataRDS),
 
+  m2_reduced =
+    lm(Glucose ~ Age + Insulin + BMI +
+         SkinThickness + DiabetesPedigreeFunction,
+       data = dataRDS),
+
+  m3_core =
+    lm(Glucose ~ Age + Insulin + BMI + SkinThickness,
+       data = dataRDS),
+
+  m4_metabolic =
+    lm(Glucose ~ Insulin + BMI + SkinThickness,
+       data = dataRDS),
+
+  m5_simple =
+    lm(Glucose ~ Insulin + BMI,
+       data = dataRDS),
+
+  m6_minimal =
+    lm(Glucose ~ BMI,
+       data = dataRDS),
+
+  m7_age_preg =
+    lm(Glucose ~ Age * Pregnancies +
+         Insulin + BMI + SkinThickness,
+       data = dataRDS),
+
+  m8_insulin_bmi =
+    lm(Glucose ~ Insulin * BMI +
+         Age + SkinThickness,
+       data = dataRDS),
+
+  m9_insulin_skin =
+    lm(Glucose ~ Insulin * SkinThickness +
+         Age + BMI,
+       data = dataRDS),
+
+  m10_bmi_skin =
+    lm(Glucose ~ BMI * SkinThickness +
+         Age + Insulin,
+       data = dataRDS),
+
+  m11_genetic_bmi =
+    lm(Glucose ~ DiabetesPedigreeFunction * BMI +
+         Age + Insulin + SkinThickness,
+       data = dataRDS),
+  
+  model4 = lm(Glucose ~ Age + Insulin + BMI + BloodPressure,
+             data = dataRDS),
+ model35 =lm(Glucose ~ Insulin * Age + BloodPressure, data = dataRDS), # AIC=3612.325, BIC=3636.168
+model36 =lm(Glucose ~ Insulin * Age + BloodPressure + BMI, data = dataRDS) # AIC=3612.325, BIC=3636.168
+ 
+)
+
+
+# Makes a dataframe of all scores in the model list.
+comparison <- data.frame(
+  Model = names(models),
+  AIC   = sapply(models, AIC),
+  BIC   = sapply(models, BIC),
+  Adj_R2 = sapply(models, function(m) summary(m)$adj.r.squared)
+) 
+
+comparison[order(comparison$AIC), ]
+
+model3 <- lm(Glucose ~ Insulin * Age + BloodPressure, data = dataRDS)
 
 # Plot with regression line for x1
 ggplot(dataRDS, aes(x = Age, y = Glucose)) +
@@ -185,40 +243,6 @@ ggplot(dataRDS, aes(x = BMI, y = Glucose)) +
 ```
 
 #################DISCUSSIE OVER MODEL BOUWEN EN ONDERBOUWEN WAAROM HET GOED IS, DIT GECOMBINEERD MET EEN BETEKENISVOLLE MODERATION TOEVOEGEN##########
-
-## **Boxplots for each predictor**
-
-These boxplots give insights into the distributions of various parameters.
-
-```{r}
-#| warning: false
-
-# Boxplot for Age vs Glucose
-ggplot(dataRDS, aes(x = factor(Age), y = Glucose)) +
-  geom_boxplot() +
-  labs(title = "Glucose Distribution by Age")
-
-# Boxplot for Insulin vs Glucose
-ggplot(dataRDS, aes(x = factor(Insulin), y = Glucose)) +
-  geom_boxplot() +
-  labs(title = "Glucose Distribution by Insulin Level")
-
-# Boxplot for SkinThickness vs Glucose
-ggplot(dataRDS, aes(x = factor(SkinThickness), y = Glucose)) +
-  geom_boxplot() +
-  labs(title = "Glucose Distribution by Skin Thickness")
-
-# Boxplot for BMI vs Glucose
-ggplot(dataRDS, aes(x = factor(BMI), y = Glucose)) +
-  geom_boxplot() +
-  labs(title = "Glucose Distribution by BMI")
-
-
-errors <- dataRDS$Glucose - predict(model3)
-squared <- errors^2
-MSE <- mean(squared)
-vif(model3)
-```
 
 ## **Assumptions**
 
