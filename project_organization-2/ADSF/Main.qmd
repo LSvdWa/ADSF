@@ -52,6 +52,11 @@ To preprocess the data we categorized the BMI into four categories, being underw
 setwd(".")
 library(ggplot2)
 library(car)
+library(magrittr)
+library(regclass)
+library(irr)
+library(lmtest)
+library(sandwich)
 ```
 
 ```{r}
@@ -129,65 +134,65 @@ Above you can see multiple ways that our variables are described. They are repre
 
 # List of all models we could think of.
 models <- list(
-
- # model with all predictor p < 0.05 
- mod2 = lm(Glucose ~ Age + Insulin + BMI + SkinThickness + DiabetesPedigreeFunction, 
+  
+   # model with all predictor p < 0.05 
+   mod2 = lm(Glucose ~ Age + Insulin + BMI + SkinThickness + DiabetesPedigreeFunction, 
+                data = dataRDS),
+   # model with all predictors p < 0.01 and moderation
+  mod3 = lm(Glucose ~ Age + Insulin + BMI + SkinThickness , 
               data = dataRDS),
- # model with all predictors p < 0.01 and moderation
- mod3 = lm(Glucose ~ Age + Insulin + BMI + SkinThickness , 
+  
+  mod4 = lm(Glucose ~ Insulin + BMI + SkinThickness + Age*Pregnancies, 
               data = dataRDS),
- 
- mod4 = lm(Glucose ~ Insulin + BMI + SkinThickness + Age*Pregnancies, 
-              data = dataRDS),
- # model with all predictors p < 0.01 and moderation
- mod6 = lm(Glucose ~ Age + Insulin + BMI, 
-              data = dataRDS),
+  # model with all predictors p < 0.01 and moderation
+  mod6 = lm(Glucose ~ Age + Insulin + BMI, 
+                data = dataRDS),
   m1_full =
     lm(Glucose ~ Age + Insulin + BMI + Pregnancies +
          BloodPressure + SkinThickness + DiabetesPedigreeFunction,
        data = dataRDS),
-
+  
   m2_reduced =
     lm(Glucose ~ Age + Insulin + BMI +
          SkinThickness + DiabetesPedigreeFunction,
        data = dataRDS),
-
+  
   m3_core =
     lm(Glucose ~ Age + Insulin + BMI + SkinThickness,
        data = dataRDS),
-
+  
   m4_metabolic =
     lm(Glucose ~ Insulin + BMI + SkinThickness,
        data = dataRDS),
-
+  
   m5_simple =
     lm(Glucose ~ Insulin + BMI,
        data = dataRDS),
-
+  
   m6_minimal =
     lm(Glucose ~ BMI,
        data = dataRDS),
-
+  
   m7_age_preg =
     lm(Glucose ~ Age * Pregnancies +
          Insulin + BMI + SkinThickness,
        data = dataRDS),
-
+  
   m8_insulin_bmi =
     lm(Glucose ~ Insulin * BMI +
          Age + SkinThickness,
        data = dataRDS),
-
+  
   m9_insulin_skin =
     lm(Glucose ~ Insulin * SkinThickness +
          Age + BMI,
        data = dataRDS),
-
+  
   m10_bmi_skin =
     lm(Glucose ~ BMI * SkinThickness +
          Age + Insulin,
        data = dataRDS),
-
+  
   m11_genetic_bmi =
     lm(Glucose ~ DiabetesPedigreeFunction * BMI +
          Age + Insulin + SkinThickness,
@@ -195,9 +200,8 @@ models <- list(
   
   model4 = lm(Glucose ~ Age + Insulin + BMI + BloodPressure,
              data = dataRDS),
- model35 =lm(Glucose ~ Insulin * Age + BloodPressure, data = dataRDS), # AIC=3612.325, BIC=3636.168
-model36 =lm(Glucose ~ Insulin * Age + BloodPressure + BMI, data = dataRDS) # AIC=3612.325, BIC=3636.168
- 
+  model35 =lm(Glucose ~ Insulin * Age + BloodPressure, data = dataRDS), # AIC=3612.325, BIC=3636.168 -> best
+  model36 =lm(Glucose ~ Insulin * Age + BloodPressure + BMI, data = dataRDS) 
 )
 
 
@@ -212,7 +216,8 @@ comparison <- data.frame(
 comparison[order(comparison$AIC), ]
 
 model3 <- lm(Glucose ~ Insulin * Age + BloodPressure, data = dataRDS)
-
+model4 <- lm(Glucose ~ Age + Insulin + BMI + BloodPressure,
+             data = dataRDS)
 # Plot with regression line for x1
 ggplot(dataRDS, aes(x = Age, y = Glucose)) +
   geom_point() +
@@ -246,87 +251,156 @@ ggplot(dataRDS, aes(x = BMI, y = Glucose)) +
 
 ## **Assumptions**
 
-To be able to use a multiple linear regression model to predict, we need to verify that it satisfies all assumptions necessary.
+We will now discuss and check the various model assumptions of linear regression.
 
-1.  Model is linear in the parameters: This holds for our values are static and non exponential as seen here:
+### Linearity
 
-```{r}
-fitted_vals <- fitted(model3)
-residuals_dev <- residuals(model3, type = "deviance")
+With the assumption of linearity, it is assumed that the relation between the dependent and independent variables is more or less linear. If this assumption would be violated, we could not be doing a linear regression and we should move to an entirely different modeling paradigm.
 
-# Plot
-plot(
-  fitted_vals,
-  residuals_dev,
-  xlab = "Fitted values",
-  ylab = "Deviance residuals",
-  main = "Residuals vs Fitted"
-)
-abline(h = 0, lty = 2)
-```
-
-###########ABOVE IS HOW WHE SHOULD SHOW LINEARITY, BESCHRIJF WAAROM DIT LINEARITY LAAT ZIEN###############\
-\############### voorbeeld van t internet Because the residuals are symmetrically distributed around zero and do not exibit non-random trends or changes in direction across the range of fitted values there is no evidence of a non linear relationship between the predictors and the log-odds of the outcome therefore the residuals-versus-fitted plot provides support that the linearity assumption is reasonably satisfied \####
-
-2.  Predictor model is full rank:
+Because it is multiple regression, a basic residual plot is not sufficient as it would not tell us which predictors exhibit nonlinear associations. Instead, Component + Residual Plots or partial residual plots can be used to visualize the unique effects of each predictor.
 
 ```{r}
-#| warning: false
-# turns model to matrix
-X <- model.matrix(model3)
-
-# Compares the rank to the amount of columns in the predictor matrix
-# if True, the predictor matrix is full rank
-qr(X)$rank == ncol(X)
+crPlots(model4)
 ```
+
+In the Component + Residual Plots it is clear that all predictors seem to have a (near) linear relationship with the Component+Residual. For Insulin there seems to be a kink in the otherwise linear relationship. We consider this as sufficient to not violate the linearity assumption.
+
+### Predictor matrix is full rank
+
+This assumption states that there need to be more observations than predictors and no predictor can be a linear combination of other predictors, meaning predictors cannot have a very high correlation (multicollinearity). If this assumption were to be violated, the parameter estimates could not be uniquely determined from the data.
+
+To check for this assumption, we use the Variance Inflation Factor (VIF) to determine multicollinearity.
 
 ```{r}
-#| warning: false
-
-# Check for normality
-plot(model3, which = 2)
-
-# shapiro test for significance values of normality check
-shapiro.test(residuals(model3))
-
-#residuals plot for homoscedasticity check and variance of errors
-plot(fitted(model3), resid(model3)) + abline(h=0, col="pink")
-
-# durbin watson test for extra check on error correlation
-durbinWatsonTest(model3)
-
-# Checking for correlated errors for all the predictor variables
-plot(dataRDS$Age, resid(model3),
-     xlab = "Age",
-     ylab = "Residuals",
-     main = "Residuals vs Age")
-abline(h = 0, col = "forestgreen")
-
-plot(dataRDS$Insulin, resid(model3),
-     xlab = "Insulin",
-     ylab = "Residuals",
-     main = "Residuals vs Insulin")
-abline(h = 0, col = "forestgreen")
-
-plot(dataRDS$BMI, resid(model3),
-     xlab = "BMI",
-     ylab = "Residuals",
-     main = "Residuals vs BMI")
-abline(h = 0, col = "forestgreen")
-
-plot(dataRDS$SkinThickness, resid(model3),
-     xlab = "SkinThickness",
-     ylab = "Residuals",
-     main = "Residuals vs SkinThickness")
-abline(h = 0, col = "forestgreen")
-
-# Density plot for normally distributed errors check
-densityPlot(errors,
-       main = paste("Density plot of errors"),
-       xlab = paste("error values"))
+VIF(model4)
 ```
 
-\############ CHECK OUTLIERS AND INFLUENTIAL CASES \########################
+A VIF-score should be interpreted as follows:
+
+-   VIF=1: this means no multicollinearity;
+
+-   VIF=5: this implies already quite some multicollinearity;
+
+-   VIF=10: this implies problematic amounts of multicollinearity.
+
+Because the VIF-scores for all four predictors is near 1, this assumption is not violated.
+
+### Exogenous predictors
+
+For this assumption, the expected value of the errors must be 0. Furthermore, the errors must be independent of the predictors. This entails that:
+
+-   $Cov(\hat Y,\epsilon)=0$
+
+-   $E[\epsilon_n]=0$
+
+Because this is more a model assumption issue rather than something to directly test as the error term is unobserved. We assume the predictors not to be endogenous. Not meeting this assumption results in biased estimates for the regression coefficients.
+
+### Constant, finite error variance
+
+This assumption is the assumption of homoscedasticity. It states that the variance of the error terms should be constant over all levels of the predictors. This can be checked by plotting the residuals against the fitted values.
+
+If this assumption would be violated, the estimated standard errors would be biased (usually downward). This would entail that test statistics would be too large, CIs wouldbe too narrow and we would have inflated Type I error rates. The heteroscedasticity will not bias the parameter estimates, meaning the best fit line would still be correct but our measure of uncertainty around that best fit line would be wrong.
+
+```{r}
+model4 %>%
+  plot(1)
+```
+
+In the plot it can be seen that the red line is quite constant. Also, the dots seem to have a rather constant variance. This indicates the this assumption is not violated.
+
+### Independent errors
+
+This assumption states that error terms should have no correlation. Dependence of the errors can result from multiple things. First, there is a possible dependence in the error terms when there is serial dependence, for example because the data contains variables that are measured over time. Another reason can be when there is a cluster structure in the data, for example students in classes in schools.
+
+Temporal dependence can be checked by investigating the autocorrelation, while clustered data can be found by investigating the intra class correlation (ICC).
+
+Our model does not seem to contain predictors that are measured over time, therefore we assume this to not be the case.
+
+We check for clustering using the ICC scores.
+
+```{r}
+ICC::ICCbare(x=dataRDS$Pregnancies, y=resid(model4))
+ICC::ICCbare(x=dataRDS$SkinThickness, y=resid(model4))
+ICC::ICCbare(x=dataRDS$DiabetesPedigreeFunction, y=resid(model4))
+```
+
+For Pregnancies and Skin thickness, we see negligible clustering with an ICC between 0 and 0.05. For the diabetes pedigree function we see an ICC between 0.05 and 0.10, which indicates small clustering. With this, we conclude that this assumption is not violated.
+
+### Normally distributed errors
+
+This assumption states that errors should be roughly normally distributed. Like the assumption of homoscedasticity, this can be checked using model plots.
+
+```{r}
+model4 %>%
+  plot(2)
+```
+
+The Q-Q plot shows that the error terms follow the ideal line pretty well, thus the assumption holds.
+
+If the assumption would have been violated, it would imply a misspecified model. Then the justification for some tests and procedures used in regression analysis might not hold. For prediction intervals, normality of errors is always desired.
+
+------------------------------------------------------------------------
+
+## Influential Observations
+
+### Outliers
+
+Outliers are observations that show extreme outcomes compared to the other data, or observations with outcome values that fit the model very badly. Outliers can be detected by inspecting the externally studentized residuals.
+
+```{r}
+model4 %>%
+  rstudent() %>%
+  plot()
+```
+
+There does not appear to be a clear outlier in this plot.
+
+### High-leverage observations
+
+High-leverage observations are observations with extreme predictor values. To detect these observations, we look at their leverage values. These values are be summarized in a leverage plot.
+
+```{r}
+model4 %>%
+  hatvalues() %>%
+  plot()
+
+# check highest leverage cases
+h <- hatvalues(model4)
+n <- nobs(model4)
+p <- length(coef(model4))
+cutoff <- 3*p/n
+idx <- which(h > cutoff)
+idx
+```
+
+Here we see a few possible outstanding observations, like the observation close to the beginning, two observations around 100 and an observation somewhere between observation 200 and 300. Looking in the dataset, these outstanding observations can be explained by their high values for Insulin. For example, index 5 has an insulin of 846, which is the largest of the dataset.
+
+A case with high leverage is not necessarily bad, the influence on the model is more important.
+
+### Influence on the model
+
+Both outliers and observations with high leverage are not necessarily a problem. Cases that are both, however, seem to form more of a problem.
+
+Influence measures come in two sorts: Cook's distance checks for influential observations, while DFBETAS check for influential, and possibly problematic, observations per regression coefficient.
+
+First we check the Cook's distance.
+
+```{r}
+model4 %>%
+  cooks.distance() %>%
+  plot()
+```
+
+Here we see outstanding distances around the beginning and around 300. Next we check the DFBETAS.
+
+```{r}
+plot(dfbetas(model4)[,1],main="intercept")
+plot(dfbetas(model4)[,2],main="slope")
+```
+
+In the DFBETAS plots, we see that different points are most outstanding, also different points as in the Cook's distance plot. From this we conclude that there is no reason to assume they are problematic.
+
+# EINDE van Assumptions en outliers/influential cases
 
 The other four assumptions of the linear regression model that were checked are linearity, homoscedasticity, normal distribution, and correlated errors. The Q-Q plot and density plot analysis suggested a potential risk for violation of the normality assumption of residuals. The can be seen in the Q-Q plot by the upper tail deviating from the dotted line and in the density plot by a slight skewing on the right of the distribution. A Shapiro-Wilk test was performed on the residuals which resulted in the test statistic W = 0.97, *p \< .05*. Normality assumption of residuals was thus not rejected. Homoscedasticity was assessed by plotting the residuals. Visual inspection of the residuals suggested heteroscedasticity with an increase in spread of the residuals at higher predicted values. The Durbin-Watson test was run to look for autocorrelation of the errors and showed a test statistic of DW ≈ 2, indicating no autocorrelation in the residuals. Finally, for the correlation of errors, we ran individual visual analyses for every predicting variable. Age, insulin, and skin thickness all suggest no correlation. BMI, however, visibly increased together with the errors. This could be explained by BMI not being a continuous variable, the grouping of the variable resulting in an uneven distribution of data points, and thus showing a correlation with the errors.
 
