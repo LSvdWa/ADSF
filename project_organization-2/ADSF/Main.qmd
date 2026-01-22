@@ -411,16 +411,14 @@ The other four assumptions of the linear regression model that were checked are 
 ```{r}
 #| warning: false
 
-summary(model3)
+summary(model4)
 ```
 
-A multiple linear regression was conducted to examine the predictors for glucose levels. This was done through the use of age, insulin, BMI, skin thickness, and a moderation variable. The overall model was significant (F(5, 387) = 50.39, p \> .01) and explains 39.4% of the variance in glucose (R² = .3934). Age has a positive effect on glucose levels where older individuals have a higher glucose level (𝛽 = .65, p \< .01). The same is true for insulin levels (𝛽 = .12, p \< .01) where insulin increases when glucose increases. However, both BMI (𝛽 = 2.55, p = .23) and skin thickness (𝛽 = .042, p = .82), although showing a positive effect, are both not significant. The moderation effect is also insignificant (𝛽 = 1.207e-06, p = .60). Overall, the results suggest that only age and insulin contribute meaningfully to glucose level variation.
-
-In model 3, an ANOVA was done to look at the significance of age, insulin, BMI, and skin thickness on glucose levels, and whether this association was influenced by the moderation term. The model showed that the interaction term does not influence the relationship between the predictors and glucose levels (F(1, 387) = 1.38, p \> .241).
+A multiple linear regression was conducted to examine the predictors for glucose levels. This was done through the use of age, insulin, BMI, and blood pressure. The overall model was significant (F(4, 388) = 64.49, p \> .01) and explains 39.94% of the variance in glucose (R² = .3994). Age has a positive effect on glucose levels where older individuals have a higher glucose level (𝛽 = .59, p \< .01). The same is true for insulin levels (𝛽 = .13, p \< .01) where insulin increases when glucose levels go up. Altough not as significant as age and insulin, blood pressure shows a significant effect on the increase of glucose levels (𝛽 = .21, p \< .05). BMI (𝛽 = 2.72, p = .13) shows a positive effect, but not a significant one. We still kept BMI in the model to explain glucose levels, since, from a logical standpoint, glucose levels are linked to BMI. Overall, the results suggest that only age, insulin, and blood pressure contribute significantly to glucose level variation.
 
 ## **Conclusion**
 
-To answer our research question, the results indicate that glucose levels can be predicted by age and insulin, which both showed a positive relation with glucose: as age and insulin increase, glucose levels will also increase. BMI, skin thickness and the moderator did not predict glucose. This highlights that, within this sample, glucose levels are in part accounted for by insulin levels and age rather than body composition or the proposed moderation effect.
+To answer our research question, the results indicate that glucose levels can be predicted by age, insulin, and blood pressure which all showed a positive relation with glucose: as age, insulin, and blood pressure increase, glucose levels will also increase. BMI did not significantly predict glucose. This highlights that, within this sample, glucose levels are in part accounted for by age, insulin levels, and blood pressure rather than body composition.
 
 Cijfers over diabetes. (n.d.). diabetes.nl. https://www.diabetes.nl/wat-is-diabetes/over-diabetes/cijfers- over-diabetes
 
