@@ -47,6 +47,7 @@ To preprocess the data we categorized the BMI into four categories, being underw
 
 ```{r}
 #| warning: false
+#| echo: false
 
 # Initialization
 setwd(".")
@@ -61,6 +62,7 @@ library(sandwich)
 
 ```{r}
 #| warning: false
+#| echo: false
 
 # Load .CSV and save as .RDS
 
@@ -88,7 +90,10 @@ dataRDS <- subset(dataRDS,
 
 ```
 
+We remove incomplete data entries and we recode BMI from continuous into 4 categories: underweight, healthy, overweight and obese.
+
 ## **Exploring the data**
+
 In the following section we will explore each part of the dataset to get a full understanding of our dataset. We do this using a range of histograms that show the distribution of each value with an interpretation of why that data matters.
 
 ```{r}
@@ -103,6 +108,7 @@ for (i in 1:1) {
        border = "white")
 }
 ```
+
 -   **Pregnancies:** number of times pregnant, represented as an integer, values range between 0-14
 
 Pregnancies is a fairly uninteresting distribution, only a couple people get pregnant more than a few times. Which makes sense! What is good to know is that pregnancies is highly influenced by age, because young people usually have not been pregnant often
@@ -118,9 +124,11 @@ for (i in 2:2) {
        border = "white")
 }
 ```
+
 -   **Glucose:** plasma glucose concentration in a toleration test represented as an integer, values range from 56-198.
 
 There is not a lot to say about the glucose distribution, it maintains the above stated values with a seemingly normal distribution that fits within norms of a healthy person.
+
 ```{r}
 #| echo: false
 for (i in 3:3) {
@@ -132,6 +140,7 @@ for (i in 3:3) {
        border = "white")
 }
 ```
+
 -   **BloodPressure:** Bloodpressure represented as an integer with values in the range of 24-110.
 
 Bloodpressure is more interesting! It ranges wide enough to question the validity of some datapoints, namely some values of bloodpressure are too low to sustain a healthy person. Meaning some of the data we use can be flawed or perhaps taken from patients in intensive care situations.
@@ -147,9 +156,11 @@ for (i in 4:4) {
        border = "white")
 }
 ```
+
 -   **Skinthickness:** Thickness of the skin in millimetres, represented as an integer with values ranging from 7-63.
 
 Skinthickness represents the thickness of the skin under the upper arm, which ranges in a normal distribution, no inferences are made using this graph so not a lot can be said about its value.
+
 ```{r}
 #| echo: false
 for (i in 5:5) {
@@ -161,9 +172,11 @@ for (i in 5:5) {
        border = "white")
 }
 ```
+
 -   **Insulin:** “2 hour serum insulin” with values ranging from 14-846.
 
 Insulin is a very important variable measured in units per milliliter with a wide range including absurdly high values. Values ranging from 20-200 can be reasonably explained but the same cannot be said about values 800+. We assume this data could be invalid or taken right after an insulin injection which is why these datapoints are not yet removed.
+
 ```{r}
 #| echo: false
 for (i in 6:6) {
@@ -175,6 +188,7 @@ for (i in 6:6) {
        border = "white")
 }
 ```
+
 -   **BMI:** BMI value represented as classification, namely: underweight=1, healthy=2, overweight=3 and obese=4. Most people in this study are considered to be obese.
 
 The most interesting part of this data is that 259/393 = 66% are obese which means our model will most likely not be good at predicting glucose for people who are underweight and less good for healthy and overweight people. While this model will be the best for predicting glucose in severely overweight people. Keep this in mind when we interpret our model.
@@ -192,6 +206,7 @@ for (i in 7:7) {
 }
 
 ```
+
 -   **DiabetesPedigreeFunction:** Quantified genetic risk of diabetes. Risks range from 0-2,24.
 
 The diabetes pedigree function is a function that predicts diabetes using hereditary information, values in this dataset conform to the limits of the function and range normally on lower values with some extremer values on the high end of the values. Due to this fitting within function norms there is no reason to assume this data is invalid.
@@ -208,6 +223,7 @@ for (i in 8:8) {
 }
 
 ```
+
 -   **Age:** Integer representing age, values range from 21-81.
 
 Age ranges widely in our dataset, it largely ranges between 21 and 60 with only a couple values above 60. Keep this in mind while interpreting our model for this means the model is not properly trained on anyone under 21 and over 60. Meaning these are the ages we likely want to use our model on.
@@ -224,6 +240,7 @@ for (i in 9:9) {
        border = "white")
 }
 ```
+
 -   **Outcome:** 0 or 1 value representing if someone has diabetes or not.
 
 Most participants don’t have diabetes in our model but values are fairly balanced by about a 2:1 split, however because we are trying to predict glucose to help people find diabetes earlier in their lifetime we will not be using this value in our model.
@@ -235,14 +252,14 @@ library(GGally)
 ggpairs(dataRDS) 
 
 ```
-In this pairs plot you can see how each value interacts with each other. Most predictors do not strongly correlate with each other with the exception of a few, namely pregnancies and age, glucose and insulin or glucose and outcome. These values are logically very closely related, for example the older you are the more pregnancies you can have. Insulin helps process glucose which directly influences it's values. A higher percentage of glucose is expected when you suffer from diabetes.
 
+In this pairs plot you can see how each value interacts with each other. Most predictors do not strongly correlate with each other with the exception of a few, namely pregnancies and age, glucose and insulin or glucose and outcome. These values are logically very closely related, for example the older you are the more pregnancies you can have. Insulin helps process glucose which directly influences it's values. A higher percentage of glucose is expected when you suffer from diabetes.
 
 ## **Building the model**
 
 ```{r}
 #| warning: false
-
+#| echo: false
 
 # List of all models we could think of.
 models <- list(
@@ -330,33 +347,6 @@ comparison[order(comparison$AIC), ]
 model3 <- lm(Glucose ~ Insulin * Age + BloodPressure, data = dataRDS)
 model4 <- lm(Glucose ~ Age + Insulin + BMI + BloodPressure,
              data = dataRDS)
-# Plot with regression line for x1
-ggplot(dataRDS, aes(x = Age, y = Glucose)) +
-  geom_point() +
-  geom_smooth(method = "lm", se = FALSE) + # se = FALSE to hide confidence interval
-  labs(title = "Linear Relationship between Age and Glucose")
-
-# Plot with regression line for x2
-ggplot(dataRDS, aes(x = Insulin, y = Glucose)) +
-  geom_point() +
-  geom_smooth(method = "lm", se = FALSE) +
-  labs(title = "Linear Relationship between Insulin and Glucose")
-
-# Plot with regression line for x1
-ggplot(dataRDS, aes(x = SkinThickness, y = Glucose)) +
-  geom_point() +
-  geom_smooth(method = "lm", se = FALSE) + # se = FALSE to hide confidence interval
-  labs(title = "Linear Relationship between Skin thickness and Glucose")
-
-# Plot with regression line for x2
-ggplot(dataRDS, aes(x = BMI, y = Glucose)) +
-  geom_point() +
-  geom_smooth(method = "lm", se = FALSE) +
-  labs(title = "Linear Relationship between BMI and Glucose")
-
-
-
-
 ```
 
 #################DISCUSSIE OVER MODEL BOUWEN EN ONDERBOUWEN WAAROM HET GOED IS, DIT GECOMBINEERD MET EEN BETEKENISVOLLE MODERATION TOEVOEGEN##########
@@ -372,6 +362,8 @@ With the assumption of linearity, it is assumed that the relation between the de
 Because it is multiple regression, a basic residual plot is not sufficient as it would not tell us which predictors exhibit nonlinear associations. Instead, Component + Residual Plots or partial residual plots can be used to visualize the unique effects of each predictor.
 
 ```{r}
+#| echo: false
+
 crPlots(model4)
 ```
 
@@ -384,6 +376,8 @@ This assumption states that there need to be more observations than predictors a
 To check for this assumption, we use the Variance Inflation Factor (VIF) to determine multicollinearity.
 
 ```{r}
+#| echo: false
+
 VIF(model4)
 ```
 
@@ -414,6 +408,8 @@ This assumption is the assumption of homoscedasticity. It states that the varian
 If this assumption would be violated, the estimated standard errors would be biased (usually downward). This would entail that test statistics would be too large, CIs wouldbe too narrow and we would have inflated Type I error rates. The heteroscedasticity will not bias the parameter estimates, meaning the best fit line would still be correct but our measure of uncertainty around that best fit line would be wrong.
 
 ```{r}
+#| echo: false
+
 model4 %>%
   plot(1)
 ```
@@ -428,9 +424,12 @@ Temporal dependence can be checked by investigating the autocorrelation, while c
 
 Our model does not seem to contain predictors that are measured over time, therefore we assume this to not be the case.
 
-We check for clustering using the ICC scores.
+We check for clustering using the ICC scores for pregnancies, skin thickness and the diabetes pedigree function respectively.
 
 ```{r}
+#| warning: false
+#| echo: false
+
 ICC::ICCbare(x=dataRDS$Pregnancies, y=resid(model4))
 ICC::ICCbare(x=dataRDS$SkinThickness, y=resid(model4))
 ICC::ICCbare(x=dataRDS$DiabetesPedigreeFunction, y=resid(model4))
@@ -443,6 +442,8 @@ For Pregnancies and Skin thickness, we see negligible clustering with an ICC bet
 This assumption states that errors should be roughly normally distributed. Like the assumption of homoscedasticity, this can be checked using model plots.
 
 ```{r}
+#| echo: false
+
 model4 %>%
   plot(2)
 ```
@@ -460,6 +461,8 @@ If the assumption would have been violated, it would imply a misspecified model.
 Outliers are observations that show extreme outcomes compared to the other data, or observations with outcome values that fit the model very badly. Outliers can be detected by inspecting the externally studentized residuals.
 
 ```{r}
+#| echo: false
+
 model4 %>%
   rstudent() %>%
   plot()
@@ -472,20 +475,14 @@ There does not appear to be a clear outlier in this plot.
 High-leverage observations are observations with extreme predictor values. To detect these observations, we look at their leverage values. These values are be summarized in a leverage plot.
 
 ```{r}
+#| echo: false
+
 model4 %>%
   hatvalues() %>%
   plot()
-
-# check highest leverage cases
-h <- hatvalues(model4)
-n <- nobs(model4)
-p <- length(coef(model4))
-cutoff <- 3*p/n
-idx <- which(h > cutoff)
-idx
 ```
 
-Here we see a few possible outstanding observations, like the observation close to the beginning, two observations around 100 and an observation somewhere between observation 200 and 300. Looking in the dataset, these outstanding observations can be explained by their high values for Insulin. For example, index 5 has an insulin of 846, which is the largest of the dataset.
+Here we see a few possible outstanding observations, like the observation close to the beginning, two observations around 100 and an observation somewhere between observation 200 and 300. Looking in the dataset, these outstanding observations can be explained by their high values for Insulin. For example, index 5 has an insulin of 846, which is the largest of the dataset. The other points standing out also have an outstanding insulin value.
 
 A case with high leverage is not necessarily bad, the influence on the model is more important.
 
@@ -498,6 +495,8 @@ Influence measures come in two sorts: Cook's distance checks for influential obs
 First we check the Cook's distance.
 
 ```{r}
+#| echo: false
+
 model4 %>%
   cooks.distance() %>%
   plot()
@@ -506,11 +505,13 @@ model4 %>%
 Here we see outstanding distances around the beginning and around 300. Next we check the DFBETAS.
 
 ```{r}
+#| echo: false
+
 plot(dfbetas(model4)[,1],main="intercept")
 plot(dfbetas(model4)[,2],main="slope")
 ```
 
-In the DFBETAS plots, we see that different points are most outstanding, also different points as in the Cook's distance plot. From this we conclude that there is no reason to assume they are problematic.
+In the DFBETAS plots, we see that different points are most outstanding, also different points as in the Cook's distance plot. From this we conclude that there is no reason to assume any of these points are problematic.
 
 # EINDE van Assumptions en outliers/influential cases
 
