@@ -89,11 +89,70 @@ dataRDS <- subset(dataRDS,
 ```
 
 ## **Exploring the data**
+In the following section we will explore each part of the dataset to get a full understanding of our dataset. We do this using a range of histograms that show the distribution of each value with an interpretation of why that data matters.
 
 ```{r}
 #| warning: false
+#| echo: false
+for (i in 1:1) {
+  col_name <- colnames(dataRDS)[i]
+  hist(dataRDS[, i],
+       main = paste("Histogram of ", col_name),
+       xlab = paste("Values of", col_name),
+       col = "pink",
+       border = "white")
+}
+```
+-   **Pregnancies:** number of times pregnant, represented as an integer, values range between 0-14
 
-for (i in 1:ncol(dataRDS)) {
+Pregnancies is a fairly uninteresting distribution, only a couple people get pregnant more than a few times. Which makes sense! What is good to know is that pregnancies is highly influenced by age, because young people usually have not been pregnant often
+
+```{r}
+#| echo: false
+for (i in 2:2) {
+  col_name <- colnames(dataRDS)[i]
+  hist(dataRDS[, i],
+       main = paste("Histogram of ", col_name),
+       xlab = paste("Values of", col_name),
+       col = "green",
+       border = "white")
+}
+```
+-   **Glucose:** plasma glucose concentration in a toleration test represented as an integer, values range from 56-198.
+
+There is not a lot to say about the glucose distribution, it maintains the above stated values with a seemingly normal distribution that fits within norms of a healthy person.
+```{r}
+#| echo: false
+for (i in 3:3) {
+  col_name <- colnames(dataRDS)[i]
+  hist(dataRDS[, i],
+       main = paste("Histogram of ", col_name),
+       xlab = paste("Values of", col_name),
+       col = "red",
+       border = "white")
+}
+```
+-   **BloodPressure:** Bloodpressure represented as an integer with values in the range of 24-110.
+
+Bloodpressure is more interesting! It ranges wide enough to question the validity of some datapoints, namely some values of bloodpressure are too low to sustain a healthy person. Meaning some of the data we use can be flawed or perhaps taken from patients in intensive care situations.
+
+```{r}
+#| echo: false
+for (i in 4:4) {
+  col_name <- colnames(dataRDS)[i]
+  hist(dataRDS[, i],
+       main = paste("Histogram of ", col_name),
+       xlab = paste("Values of", col_name),
+       col = "beige",
+       border = "white")
+}
+```
+-   **Skinthickness:** Thickness of the skin in millimetres, represented as an integer with values ranging from 7-63.
+
+Skinthickness represents the thickness of the skin under the upper arm, which ranges in a normal distribution, no inferences are made using this graph so not a lot can be said about its value.
+```{r}
+#| echo: false
+for (i in 5:5) {
   col_name <- colnames(dataRDS)[i]
   hist(dataRDS[, i],
        main = paste("Histogram of ", col_name),
@@ -101,30 +160,81 @@ for (i in 1:ncol(dataRDS)) {
        col = "lightblue",
        border = "white")
 }
-pairs(dataRDS)
 ```
-
-\########## DESCRIBE WHY EACH HISTOGRAM IS MEANINGFUL AND WHERE IN THE PAIRS YOU CAN SEE INTERESTING INTERACTIONS##############
-
-Above you can see multiple ways that our variables are described. They are represented in two ways: using histograms and using.a panel. In the histograms you can see which values are representative of each variable while in the panel you can see the relation between of each variable with each other variable. The histograms will be briefly discussed, however remaining discussion will focus only on the relevant plots from the panel which we use for regression.
-
--   **Pregnancies:** number of times pregnant, represented as an integer, values range between 0-14
-
--   **Glucose:** plasma glucose concentration in a toleration test represented as an integer, values range from 56-198.
-
--   **BloodPressure:** Bloodpressure represented as an integer with values in the range of 24-110.
-
--   **Skinthickness:** Thickness of the skin in millimetres, represented as an integer with values ranging from 7-63.
-
 -   **Insulin:** “2 hour serum insulin” with values ranging from 14-846.
 
+Insulin is a very important variable measured in units per milliliter with a wide range including absurdly high values. Values ranging from 20-200 can be reasonably explained but the same cannot be said about values 800+. We assume this data could be invalid or taken right after an insulin injection which is why these datapoints are not yet removed.
+```{r}
+#| echo: false
+for (i in 6:6) {
+  col_name <- colnames(dataRDS)[i]
+  hist(dataRDS[, i],
+       main = paste("Histogram of ", col_name),
+       xlab = paste("Values of", col_name),
+       col = "orange",
+       border = "white")
+}
+```
 -   **BMI:** BMI value represented as classification, namely: underweight=1, healthy=2, overweight=3 and obese=4. Most people in this study are considered to be obese.
 
--   **DiabetesPedigreeFunction:** Quantified genetic risk of diabetes. Risks range from 0-1,75. 
+The most interesting part of this data is that 259/393 = 66% are obese which means our model will most likely not be good at predicting glucose for people who are underweight and less good for healthy and overweight people. While this model will be the best for predicting glucose in severely overweight people. Keep this in mind when we interpret our model.
 
--   **Age:** Integer representing age, values range from 20-70.
+```{r}
+#| echo: false
+#| warning: false
+for (i in 7:7) {
+  col_name <- colnames(dataRDS)[i]
+  hist(dataRDS[, i],
+       main = paste("Histogram of ", col_name),
+       xlab = paste("Values of", col_name),
+       col = "lightblue",
+       border = "white")
+}
 
--   **Outcome:** 0 or 1 value representing if someone has diabetes or not. Most participants don’t have diabetes.
+```
+-   **DiabetesPedigreeFunction:** Quantified genetic risk of diabetes. Risks range from 0-2,24.
+
+The diabetes pedigree function is a function that predicts diabetes using hereditary information, values in this dataset conform to the limits of the function and range normally on lower values with some extremer values on the high end of the values. Due to this fitting within function norms there is no reason to assume this data is invalid.
+
+```{r}
+#| echo: false
+for (i in 8:8) {
+  col_name <- colnames(dataRDS)[i]
+  hist(dataRDS[, i],
+       main = paste("Histogram of ", col_name),
+       xlab = paste("Values of", col_name),
+       col = "black",
+       border = "white")
+}
+
+```
+-   **Age:** Integer representing age, values range from 21-81.
+
+Age ranges widely in our dataset, it largely ranges between 21 and 60 with only a couple values above 60. Keep this in mind while interpreting our model for this means the model is not properly trained on anyone under 21 and over 60. Meaning these are the ages we likely want to use our model on.
+
+```{r}
+#| echo: false
+#| warning: false
+for (i in 9:9) {
+  col_name <- colnames(dataRDS)[i]
+  hist(dataRDS[, i],
+       main = paste("Histogram of ", col_name),
+       xlab = paste("Values of", col_name),
+       col = "lightblue",
+       border = "white")
+}
+```
+-   **Outcome:** 0 or 1 value representing if someone has diabetes or not.
+
+Most participants don’t have diabetes in our model but values are fairly balanced by about a 2:1 split, however because we are trying to predict glucose to help people find diabetes earlier in their lifetime we will not be using this value in our model.
+
+```{r}
+#| echo: false
+ggpairs(dataRDS)
+
+```
+In this pairs plot you can see how each value interacts with each other. Most predictors do not strongly correlate with each other with the exception of a few, namely pregnancies and age, glucose and insulin or glucose and outcome. These values are logically very closely related, for example the older you are the more pregnancies you can have. Insulin helps process glucose which directly influences it's values. A higher percentage of glucose is expected when you suffer from diabetes.
+
 
 ## **Building the model**
 
