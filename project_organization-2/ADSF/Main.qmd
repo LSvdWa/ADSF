@@ -230,7 +230,9 @@ Most participants don’t have diabetes in our model but values are fairly balan
 
 ```{r}
 #| echo: false
-ggpairs(dataRDS)
+
+library(GGally)
+ggpairs(dataRDS) 
 
 ```
 In this pairs plot you can see how each value interacts with each other. Most predictors do not strongly correlate with each other with the exception of a few, namely pregnancies and age, glucose and insulin or glucose and outcome. These values are logically very closely related, for example the older you are the more pregnancies you can have. Insulin helps process glucose which directly influences it's values. A higher percentage of glucose is expected when you suffer from diabetes.
