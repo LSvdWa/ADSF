@@ -37,11 +37,11 @@ The different parameters in the dataset are:
 
 -   Outcome: Class variable (0 or 1, where 1 means positive for diabetes)
 
-Our research question is as follows: can we predict whether someone has diabetes based on the parameters given in the dataset, namely: Pregnancies, Glucose, BloodPressure, SkinThickness, Insulin, BMI, DiabetesPedigreeFunction, Age and outcome or a subset of these paramaters using logistic regression?
+Our research question is as follows: can we predict whether someones glucose-concentration based on the parameters given in the dataset, namely: Pregnancies, BloodPressure, SkinThickness, Insulin, BMI, DiabetesPedigreeFunction, Age and outcome or a subset of these parameters using linear regression?
 
 ## **Preprocessing & Loading data**
 
-To preprocess the data we categorized the BMI into four categories, being underweight, healthy, overweight and obese. We have kept all the data, because there were not many missing values or flukes in the data.
+To preprocess the data we categorized the BMI into four categories, being underweight, healthy, overweight and obese. We have not kept all the data, because there were missing values in the data. We removed these entries, as we had no way to get our hands on the fitting values.
 
 ------------------------------------------------------------------------
 
@@ -89,8 +89,6 @@ dataRDS <- subset(dataRDS,
                      SkinThickness != 0)
 
 ```
-
-We remove incomplete data entries and we recode BMI from continuous into 4 categories: underweight, healthy, overweight and obese.
 
 ## **Exploring the data**
 
@@ -327,16 +325,32 @@ models <- list(
                data = dataRDS) 
 )
 
-# Model Comparison 
+# Model Comparison used to compare many models 
 comparison <- data.frame(
   Model  = names(models),
   AIC    = sapply(models, AIC),
   BIC    = sapply(models, BIC),
   Adj_R2 = sapply(models, function(m) summary(m)$adj.r.squared)
 )
+#comparison[order(comparison$AIC), ]
 
-comparison[order(comparison$AIC), ]
-
+discussed_models  <- list(
+  model4  = lm(Glucose ~ Age + Insulin + BMI + BloodPressure,
+               data = dataRDS), 
+               
+  model35 = lm(Glucose ~ Insulin * Age + BloodPressure, 
+               data = dataRDS), # Lowest AIC/BIC
+               
+  model36 = lm(Glucose ~ Insulin * Age + BloodPressure + BMI, 
+               data = dataRDS)  
+)
+discussed_models_comparison <- data.frame(
+  #Model = names(discussed_models),
+  AIC = sapply(discussed_models, AIC),
+  BIC = sapply(discussed_models, BIC),
+  Adj_R2 = sapply(discussed_models, function(x) summary(x)$adj.r.squared)
+)
+discussed_models_comparison
 # Final model
 
 model4 <- lm(Glucose ~ Age + Insulin + BMI + BloodPressure, data = dataRDS)
@@ -345,15 +359,33 @@ model4 <- lm(Glucose ~ Age + Insulin + BMI + BloodPressure, data = dataRDS)
 
 ## **Model discussion**
 
-To find the most suitable model for predicting glucose levels, we compared various models based on the Akaike Information Criterion (AIC) and Bayesian Information Criterion (BIC). The table above shows that model35, inclusing the moderation Age\*Insulin, has the lowest AIC and BIC values. From a statistical perspective and purely based on the AIC and BIC scores, this appears to be the model that gives the most information with the least amount of complexity.
+The model development began with an exploratory phase where various combinations of variables were tested based on individual significance and theoretical relevance. We then followed a systematic "Full-to-Minimal" approach, starting with a model that included all predictors: pregnancies, age, insulin, BMI, blood pressure, skin thickness, and the diabetes pedigree function. By removing variables with the least amount of explanatory power, we created simplified models focused on metabolic indicators. In addition to additive models, we made several moderations to test whether variables influenced each other, such as the moderation between age and pregnancies or insulin and BMI.
 
-However, better inspection of model35, but also model36, showed that the relationship between the predictors and the dependent variable glucose were not fully linear. This would violate a a fundamental assumption of linear regression. Next to that, both models had predictors with high VIF scores as can be seen in the table above. This would mean that the estimates of the regression coefficients would become unreliable and that the model is unable to distinguish which effect belongs to which variable. Because of the fact that both models were violating the linearity assumption and that both models had predictors with high VIF score, we decided that we had to go for another model.
+Through keep comparing the models by statistical fit and predictor correlations, we narrowed our analysis to three final models: model4, model35, and model36. These candidates were identified as the most robust configurations after evaluating their AIC and BIC scores to balance explanatory power with model simplicity.
+
+To find the most suitable model for predicting glucose levels, we compared various models based on the Akaike Information Criterion (AIC) and Bayesian Information Criterion (BIC). The table above shows that model35, including the moderation Age\*Insulin, has the lowest AIC and BIC values. From a statistical perspective and purely based on the AIC and BIC scores, this appears to be the model that gives the most information with the least amount of complexity.
+
+However, better inspection of model35 and model36 showed that the relationship between the predictors and the dependent variable glucose were not fully linear. This would violate a a fundamental assumption of linear regression. Next to that, both models had predictors with high VIF scores as can be seen in the table below. This would mean that the estimates of the regression coefficients would become unreliable and that the model is unable to distinguish which effect belongs to which variable. Because of the fact that both models were violating the linearity assumption and that both models had predictors with high VIF score, we decided that we had to go for another model.
+
+The VIF scores for the predictors of model35 and model36 respectively:
+
+```{r}
+#| echo: false
+model35 <- lm(Glucose ~ Insulin * Age + BloodPressure, 
+               data = dataRDS) # Lowest AIC/BIC
+               
+model36 <- lm(Glucose ~ Insulin * Age + BloodPressure + BMI, 
+               data = dataRDS)  
+
+VIF(model35)
+VIF(model36)
+```
 
 Therefore, we have chosen model 4:
 
 model4 = lm(Glucose \~ Age + Insulin + BMI + BloodPressure, data = dataRDS)
 
-Although the AIC and BIC are slightly higher than in model35 and model36, model4 still performs significantly strong. It is an additive model that combines medically logical predictors such as age, insulin, BMI, and blood pressure without complex interactions. This not only makes the model more interpretable, but also ensures we remain within the constraints of linear regression.
+Although the AIC and BIC are slightly higher than in model35 and model36, model4 still performs significantly strong. It is an additive model that combines medically logical predictors such as age, insulin, BMI, and blood pressure without any interactions. This not only makes the model more interpretable, but also ensures we remain within the constraints of linear regression.
 
 ## **Assumptions**
 
@@ -517,17 +549,11 @@ plot(dfbetas(model4)[,2],main="slope")
 
 In the DFBETAS plots, we see that different points are most outstanding, also different points as in the Cook's distance plot. From this we conclude that there is no reason to assume any of these points are problematic.
 
-# EINDE van Assumptions en outliers/influential cases
-
-The other four assumptions of the linear regression model that were checked are linearity, homoscedasticity, normal distribution, and correlated errors. The Q-Q plot and density plot analysis suggested a potential risk for violation of the normality assumption of residuals. The can be seen in the Q-Q plot by the upper tail deviating from the dotted line and in the density plot by a slight skewing on the right of the distribution. A Shapiro-Wilk test was performed on the residuals which resulted in the test statistic W = 0.97, *p \< .05*. Normality assumption of residuals was thus not rejected. Homoscedasticity was assessed by plotting the residuals. Visual inspection of the residuals suggested heteroscedasticity with an increase in spread of the residuals at higher predicted values. The Durbin-Watson test was run to look for autocorrelation of the errors and showed a test statistic of DW ≈ 2, indicating no autocorrelation in the residuals. Finally, for the correlation of errors, we ran individual visual analyses for every predicting variable. Age, insulin, and skin thickness all suggest no correlation. BMI, however, visibly increased together with the errors. This could be explained by BMI not being a continuous variable, the grouping of the variable resulting in an uneven distribution of data points, and thus showing a correlation with the errors.
-
-\########## EXPAND on the effect of violating an assumption \############
-
 ## **Exploring the model**
 
 ```{r}
 #| warning: false
-
+#| echo: false
 summary(model4)
 ```
 
@@ -536,6 +562,8 @@ A multiple linear regression was conducted to examine the predictors for glucose
 ## **Conclusion**
 
 To answer our research question, the results indicate that glucose levels can be predicted by age, insulin, and blood pressure which all showed a positive relation with glucose: as age, insulin, and blood pressure increase, glucose levels will also increase. BMI did not significantly predict glucose. This highlights that, within this sample, glucose levels are in part accounted for by age, insulin levels, and blood pressure rather than body composition.
+
+## Literature
 
 Cijfers over diabetes. (n.d.). diabetes.nl. https://www.diabetes.nl/wat-is-diabetes/over-diabetes/cijfers- over-diabetes
 
